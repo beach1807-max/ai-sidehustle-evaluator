@@ -1,6 +1,7 @@
 import { evaluateWithProvider } from "./evaluateWithProvider";
 export async function evaluateFromApiRequest(payload, env) {
-    if (!isEvaluationInput(payload)) {
+    const input = toEvaluationInput(payload);
+    if (!input) {
         return {
             status: 400,
             body: {
@@ -13,7 +14,7 @@ export async function evaluateFromApiRequest(payload, env) {
         };
     }
     try {
-        const result = await evaluateWithProvider(payload, env);
+        const result = await evaluateWithProvider(input, env);
         return {
             status: 200,
             body: {
@@ -49,17 +50,29 @@ export function methodNotAllowedResponse() {
         },
     };
 }
-function isEvaluationInput(value) {
+function toEvaluationInput(value) {
     if (!value || typeof value !== "object" || Array.isArray(value)) {
-        return false;
+        return null;
     }
     const input = value;
-    return (isNonEmptyString(input.idea) &&
-        isNonEmptyString(input.availableTime) &&
-        isNonEmptyString(input.avoidThings));
+    if (!isNonEmptyString(input.idea) || !isNonEmptyString(input.availableTime)) {
+        return null;
+    }
+    return {
+        idea: input.idea.trim(),
+        availableTime: input.availableTime.trim(),
+        avoidThings: normalizeAvoidThings(input.avoidThings),
+    };
 }
 function isNonEmptyString(value) {
     return typeof value === "string" && value.trim().length > 0;
+}
+function normalizeAvoidThings(value) {
+    if (typeof value !== "string") {
+        return "無特別限制";
+    }
+    const trimmedValue = value.trim();
+    return trimmedValue || "無特別限制";
 }
 function getPublicErrorMessage(error) {
     if (error.code === "GEMINI_RATE_LIMITED") {

@@ -31,18 +31,18 @@ type EvaluateApiResponse =
 const fields = [
   {
     id: "idea",
-    label: "你的副業點子是什麼？",
-    placeholder: "例如：我想做一個 AI 寵物飼料分析推薦網站",
+    label: "副業點子",
+    placeholder: "例如：\nAI 寵物飼料分析推薦",
   },
   {
     id: "time",
-    label: "你能投入多少時間？",
-    placeholder: "例如：下班後每天 1～2 小時，週末半天",
+    label: "可投入時間",
+    placeholder: "例如：\n下班後每天 1～2 小時",
   },
   {
     id: "avoid",
-    label: "你不想做哪些事？",
-    placeholder: "例如：不想拜訪客戶、不想做客服、不想上架 App、不想長期人工維護資料",
+    label: "不想做哪些事（選填）",
+    placeholder: "例如：\n不想做客服\n不想拜訪客戶\n不想長期人工維護資料\n\n可留空",
   },
 ];
 
@@ -67,6 +67,13 @@ export function EvaluatePage() {
       availableTime: values.time ?? "",
       avoidThings: values.avoid ?? "",
     };
+
+    const validationMessage = validateInput(evaluationInput);
+    if (validationMessage) {
+      setError(validationMessage);
+      setIsLoading(false);
+      return;
+    }
 
     const savedInput = {
       idea: evaluationInput.idea,
@@ -237,4 +244,16 @@ function getProviderErrorMessage(code?: string) {
   }
 
   return genericErrorMessage;
+}
+
+function validateInput(input: EvaluationInput) {
+  if (!input.idea.trim()) {
+    return "請輸入副業點子";
+  }
+
+  if (!input.availableTime.trim()) {
+    return "請輸入可投入時間";
+  }
+
+  return "";
 }

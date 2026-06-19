@@ -28,7 +28,7 @@ ${input.idea || "未提供"}
 ${input.availableTime || "未提供"}
 
 不想做的事情：
-${input.avoidThings || "未提供"}
+${input.avoidThings || "無特別限制"}
 
 請只輸出 JSON，不要輸出 Markdown，不要輸出額外說明文字。
 

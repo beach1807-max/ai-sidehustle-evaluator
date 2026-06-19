@@ -20,7 +20,9 @@ export async function evaluateFromApiRequest(
   payload: unknown,
   env?: AiRuntimeEnv
 ): Promise<{ status: number; body: EvaluateApiResult }> {
-  if (!isEvaluationInput(payload)) {
+  const input = toEvaluationInput(payload);
+
+  if (!input) {
     return {
       status: 400,
       body: {
@@ -34,7 +36,7 @@ export async function evaluateFromApiRequest(
   }
 
   try {
-    const result = await evaluateWithProvider(payload, env);
+    const result = await evaluateWithProvider(input, env);
 
     return {
       status: 200,
@@ -77,21 +79,34 @@ export function methodNotAllowedResponse() {
   };
 }
 
-function isEvaluationInput(value: unknown): value is EvaluationInput {
+function toEvaluationInput(value: unknown): EvaluationInput | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
-    return false;
+    return null;
   }
 
   const input = value as Record<string, unknown>;
-  return (
-    isNonEmptyString(input.idea) &&
-    isNonEmptyString(input.availableTime) &&
-    isNonEmptyString(input.avoidThings)
-  );
+  if (!isNonEmptyString(input.idea) || !isNonEmptyString(input.availableTime)) {
+    return null;
+  }
+
+  return {
+    idea: input.idea.trim(),
+    availableTime: input.availableTime.trim(),
+    avoidThings: normalizeAvoidThings(input.avoidThings),
+  };
 }
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
+}
+
+function normalizeAvoidThings(value: unknown): string {
+  if (typeof value !== "string") {
+    return "無特別限制";
+  }
+
+  const trimmedValue = value.trim();
+  return trimmedValue || "無特別限制";
 }
 
 function getPublicErrorMessage(error: { code?: string; message?: string }) {
