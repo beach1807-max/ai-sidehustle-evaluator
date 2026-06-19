@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ActionButton } from "../components/Buttons";
 import { mockProvider } from "../lib/ai/mockProvider";
@@ -50,14 +50,29 @@ export function EvaluatePage() {
   const navigate = useNavigate();
   const showDevTools = import.meta.env.VITE_SHOW_DEV_TOOLS === "true";
   const [isLoading, setIsLoading] = useState(false);
+  const [isTakingLonger, setIsTakingLonger] = useState(false);
   const [values, setValues] = useState<Record<string, string>>({});
   const [error, setError] = useState("");
   const [showFallback, setShowFallback] = useState(false);
   const [fallbackStatus, setFallbackStatus] = useState("");
 
+  useEffect(() => {
+    if (!isLoading) {
+      setIsTakingLonger(false);
+      return;
+    }
+
+    const timerId = window.setTimeout(() => {
+      setIsTakingLonger(true);
+    }, 20000);
+
+    return () => window.clearTimeout(timerId);
+  }, [isLoading]);
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsLoading(true);
+    setIsTakingLonger(false);
     setError("");
     setShowFallback(false);
     setFallbackStatus("");
@@ -177,12 +192,32 @@ export function EvaluatePage() {
         </div>
         <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
           <ActionButton disabled={isLoading}>
-            {isLoading ? "正在產生 AI 評估報告，通常需要 10～30 秒..." : "開始冷靜評估"}
+            {isLoading ? "分析中..." : "開始冷靜評估"}
           </ActionButton>
           <p className="text-sm text-slate-500">
             目前為 AI 測試版，會依環境設定使用 Gemini 或 Mock provider。
           </p>
         </div>
+        {isLoading && (
+          <div className="mt-4 rounded-md border border-steel/20 bg-frost p-4 text-sm leading-6 text-steel">
+            <div className="flex items-start gap-3">
+              <span className="mt-1 h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-steel/30 border-t-steel" />
+              <div>
+                <p className="font-semibold text-ink">
+                  正在冷靜分析你的副業點子...
+                </p>
+                <p className="mt-1">
+                  通常需要 10～20 秒，請不要關閉頁面。
+                </p>
+                {isTakingLonger && (
+                  <p className="mt-3 rounded-md bg-white/70 p-3 font-medium text-signal">
+                    AI 正在整理較完整的評估報告，請再稍等一下。
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
         {error && (
           <pre className="mt-4 whitespace-pre-wrap rounded-md border border-red-200 bg-red-50 p-4 text-sm leading-6 text-danger">
             {error}
