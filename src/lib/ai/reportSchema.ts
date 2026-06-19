@@ -1,0 +1,87 @@
+export const geminiReportResponseSchema = {
+  type: "OBJECT",
+  properties: {
+    id: { type: "STRING" },
+    title: { type: "STRING" },
+    score: { type: "NUMBER" },
+    scoreLabel: { type: "STRING" },
+    summary: { type: "STRING" },
+    dimensions: {
+      type: "ARRAY",
+      minItems: 7,
+      maxItems: 7,
+      items: {
+        type: "OBJECT",
+        properties: {
+          name: { type: "STRING" },
+          score: { type: "NUMBER" },
+          maxScore: { type: "NUMBER" },
+          comment: { type: "STRING" },
+        },
+        required: ["name", "score", "maxScore", "comment"],
+      },
+    },
+    oneSentenceVerdict: { type: "STRING" },
+    strengths: { type: "ARRAY", items: { type: "STRING" } },
+    risks: { type: "ARRAY", items: { type: "STRING" } },
+    fatalWarnings: { type: "ARRAY", items: { type: "STRING" } },
+    productShape: {
+      type: "OBJECT",
+      properties: {
+        format: { type: "STRING" },
+        userFlow: {
+          type: "ARRAY",
+          minItems: 4,
+          items: { type: "STRING" },
+        },
+        userSees: {
+          type: "ARRAY",
+          minItems: 5,
+          items: { type: "STRING" },
+        },
+        firstVersionLook: {
+          type: "ARRAY",
+          minItems: 4,
+          items: { type: "STRING" },
+        },
+      },
+      required: ["format", "userFlow", "userSees", "firstVersionLook"],
+    },
+    dontBuild: {
+      type: "ARRAY",
+      minItems: 3,
+      items: { type: "STRING" },
+    },
+    pricingSuggestion: { type: "STRING" },
+    validationGoal: { type: "STRING" },
+    validationPlan: {
+      type: "ARRAY",
+      minItems: 7,
+      maxItems: 7,
+      items: {
+        type: "OBJECT",
+        properties: {
+          day: { type: "STRING" },
+          task: { type: "STRING" },
+        },
+        required: ["day", "task"],
+      },
+    },
+  },
+  required: [
+    "id",
+    "title",
+    "score",
+    "scoreLabel",
+    "summary",
+    "dimensions",
+    "oneSentenceVerdict",
+    "strengths",
+    "risks",
+    "fatalWarnings",
+    "productShape",
+    "dontBuild",
+    "pricingSuggestion",
+    "validationPlan",
+  ],
+} as const;
