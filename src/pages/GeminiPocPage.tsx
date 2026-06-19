@@ -246,7 +246,7 @@ export function GeminiPocPage() {
           這是開發測試頁，用來測試 Gemini 是否能穩定產出符合報告格式的 JSON。
         </p>
         <p className="mt-3 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm leading-6 text-signal">
-          如果尚未設定 GEMINI_API_KEY，本頁可以先檢查 PoC 介面與流程；實際呼叫 Gemini 需要事後在 .env 補上 API Key。
+          如果尚未設定 server side Gemini 金鑰，本頁可以先檢查 PoC 介面與流程；實際呼叫 Gemini 需要事後在本機環境檔補上金鑰。
         </p>
       </div>
 
