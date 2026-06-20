@@ -53,6 +53,40 @@ export type DeepReport = {
     estimatedFileCount: string;
     mvpDoneCriteria: string[];
   };
+  agentDevelopmentKit: {
+    projectBrief: string;
+    suggestedFileStructure: string[];
+    coreComponents: string[];
+    stateAndDataFlow: string[];
+    implementationSteps: string[];
+    copyPasteAgentBrief: string;
+  };
+  agentPromptPack: {
+    buildPrompt: string;
+    uiPrompt: string;
+    dataPrompt: string;
+    QARevisionPrompt: string;
+  };
+  marketingStarterPack: {
+    positioning: string;
+    audiencePainPoints: string[];
+    launchChannels: string[];
+    contentIdeas: string[];
+    validationMessages: string[];
+  };
+  salesPageCopyPack: {
+    heroTitle: string;
+    heroSubtitle: string;
+    problemSection: string;
+    solutionSection: string;
+    featureBullets: string[];
+    proofSection: string;
+    faq: {
+      question: string;
+      answer: string;
+    }[];
+    finalCta: string;
+  };
 };
 
 export const sampleDeepReport: DeepReport = {
@@ -153,5 +187,80 @@ export const sampleDeepReport: DeepReport = {
       "開發者模式可產生深度報告",
       "所有頁面可在手機與桌機閱讀",
     ],
+  },
+  agentDevelopmentKit: {
+    projectBrief:
+      "建立一個讓使用者輸入副業點子後，取得冷靜評分、深度 MVP 建議與 7 天驗證計畫的單頁工具。",
+    suggestedFileStructure: [
+      "src/pages/EvaluatePage.tsx",
+      "src/pages/DeepReportPreviewPage.tsx",
+      "src/components/DeepReportView.tsx",
+      "src/lib/ai/serverEvaluate.ts",
+      "src/lib/deepReportPrompt.ts",
+    ],
+    coreComponents: ["輸入表單", "免費報告卡片", "深度報告區塊", "CTA 預覽區"],
+    stateAndDataFlow: [
+      "使用者送出 EvaluationInput",
+      "前端呼叫 /api/evaluate 並指定 mode",
+      "serverEvaluate 依 mode 選擇 free 或 deep",
+      "結果存入 localStorage 後導向報告頁",
+    ],
+    implementationSteps: [
+      "先完成輸入與驗證",
+      "接上 AI provider",
+      "顯示免費報告",
+      "加入 deep report 預覽與開發包區塊",
+    ],
+    copyPasteAgentBrief:
+      "請建立一個 React + Vite MVP 評估工具，使用現有 EvaluationInput 與 DeepReport schema，完成輸入頁、免費報告頁與 Deep Report 預覽頁，不新增登入、資料庫或金流。",
+  },
+  agentPromptPack: {
+    buildPrompt:
+      "請根據 DeepReport 的 agentMvpKit 與 agentDevelopmentKit 建立 MVP。優先完成可操作流程，不做登入、後台、付款或資料庫。",
+    uiPrompt:
+      "請設計一個務實、可閱讀、手機友善的 MVP 評估工具 UI。報告內容以清楚分段呈現，不使用誇大銷售語氣。",
+    dataPrompt:
+      "請依照 DeepReport schema 建立型別、範例資料與安全的 normalize 函式，缺少陣列欄位時回傳空陣列。",
+    QARevisionPrompt:
+      "請檢查 MVP 是否符合 7 天可完成範圍，移除登入、付款、社群、複雜後台與不必要資料庫。",
+  },
+  marketingStarterPack: {
+    positioning: "給時間有限的一人副業者，用來把模糊點子縮成 7 天可驗證 MVP。",
+    audiencePainPoints: [
+      "點子太多但不知道先做哪個",
+      "容易把第一版做太大",
+      "不確定是否值得投入開發時間",
+    ],
+    launchChannels: ["Threads", "Facebook 副業社團", "Indie Hackers", "個人電子報"],
+    contentIdeas: [
+      "公開拆解一個副業點子為 7 天 MVP",
+      "比較應該刪除與保留的 MVP 功能",
+      "分享 AI Agent 開發包範例",
+    ],
+    validationMessages: [
+      "我做了一個工具，可以把副業點子縮成 7 天可驗證版本，想找 5 位測試。",
+      "如果你有副業點子但怕做太大，我可以幫你產一份冷靜版 MVP 報告。",
+    ],
+  },
+  salesPageCopyPack: {
+    heroTitle: "把副業點子變成 7 天可驗證 MVP",
+    heroSubtitle:
+      "輸入你的點子，取得冷靜評估、AI Agent 開發包、推廣起手式與收費頁文案。",
+    problemSection: "多數副業點子不是不能做，而是第一版做得太大、太慢、太不像驗證。",
+    solutionSection:
+      "這份報告會把點子拆成可執行的 MVP 範圍，並提供可交給 AI Agent 的開發提示。",
+    featureBullets: ["MVP 功能切分", "AI Agent 啟動包", "推廣訊息", "收費頁文案"],
+    proofSection: "適合先用免費報告驗證方向，再用深度報告整理開發與推廣材料。",
+    faq: [
+      {
+        question: "這會保證副業成功嗎？",
+        answer: "不會。它只協助你縮小範圍並更快驗證。",
+      },
+      {
+        question: "需要會寫程式嗎？",
+        answer: "不一定，但若要用 AI Agent 開發 MVP，懂基本產品邏輯會更有效。",
+      },
+    ],
+    finalCta: "產生我的 MVP 啟動包",
   },
 };

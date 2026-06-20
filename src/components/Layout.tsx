@@ -9,6 +9,8 @@ const links = [
 const devLinks = [
   { href: "/prompt-preview", label: "Prompt Preview" },
   { href: "/json-preview", label: "JSON Preview" },
+  { href: "/deep-report-prompt-preview", label: "Deep Prompt Preview" },
+  { href: "/deep-report-json-preview", label: "Deep JSON Preview" },
   { href: "/gemini-poc", label: "Gemini PoC" },
 ];
 

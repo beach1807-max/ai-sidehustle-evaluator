@@ -89,6 +89,14 @@ const stringArraySchema = {
     type: "ARRAY",
     items: { type: "STRING" },
 };
+const faqItemSchema = {
+    type: "OBJECT",
+    properties: {
+        question: { type: "STRING" },
+        answer: { type: "STRING" },
+    },
+    required: ["question", "answer"],
+};
 export const geminiDeepReportResponseSchema = {
     type: "OBJECT",
     properties: {
@@ -208,6 +216,78 @@ export const geminiDeepReportResponseSchema = {
                 "mvpDoneCriteria",
             ],
         },
+        agentDevelopmentKit: {
+            type: "OBJECT",
+            properties: {
+                projectBrief: { type: "STRING" },
+                suggestedFileStructure: stringArraySchema,
+                coreComponents: stringArraySchema,
+                stateAndDataFlow: stringArraySchema,
+                implementationSteps: stringArraySchema,
+                copyPasteAgentBrief: { type: "STRING" },
+            },
+            required: [
+                "projectBrief",
+                "suggestedFileStructure",
+                "coreComponents",
+                "stateAndDataFlow",
+                "implementationSteps",
+                "copyPasteAgentBrief",
+            ],
+        },
+        agentPromptPack: {
+            type: "OBJECT",
+            properties: {
+                buildPrompt: { type: "STRING" },
+                uiPrompt: { type: "STRING" },
+                dataPrompt: { type: "STRING" },
+                QARevisionPrompt: { type: "STRING" },
+            },
+            required: ["buildPrompt", "uiPrompt", "dataPrompt", "QARevisionPrompt"],
+        },
+        marketingStarterPack: {
+            type: "OBJECT",
+            properties: {
+                positioning: { type: "STRING" },
+                audiencePainPoints: stringArraySchema,
+                launchChannels: stringArraySchema,
+                contentIdeas: stringArraySchema,
+                validationMessages: stringArraySchema,
+            },
+            required: [
+                "positioning",
+                "audiencePainPoints",
+                "launchChannels",
+                "contentIdeas",
+                "validationMessages",
+            ],
+        },
+        salesPageCopyPack: {
+            type: "OBJECT",
+            properties: {
+                heroTitle: { type: "STRING" },
+                heroSubtitle: { type: "STRING" },
+                problemSection: { type: "STRING" },
+                solutionSection: { type: "STRING" },
+                featureBullets: stringArraySchema,
+                proofSection: { type: "STRING" },
+                faq: {
+                    type: "ARRAY",
+                    items: faqItemSchema,
+                },
+                finalCta: { type: "STRING" },
+            },
+            required: [
+                "heroTitle",
+                "heroSubtitle",
+                "problemSection",
+                "solutionSection",
+                "featureBullets",
+                "proofSection",
+                "faq",
+                "finalCta",
+            ],
+        },
     },
     required: [
         "feasibility",
@@ -219,5 +299,9 @@ export const geminiDeepReportResponseSchema = {
         "acquisition",
         "mvpReduction",
         "agentExecutionStrategy",
+        "agentDevelopmentKit",
+        "agentPromptPack",
+        "marketingStarterPack",
+        "salesPageCopyPack",
     ],
 };

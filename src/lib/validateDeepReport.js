@@ -11,6 +11,10 @@ export function validateDeepReport(data) {
     requireObject(report.pricing, "pricing", errors);
     requireObject(report.acquisition, "acquisition", errors);
     requireObject(report.mvpReduction, "mvpReduction", errors);
+    requireObject(report.agentDevelopmentKit, "agentDevelopmentKit", errors);
+    requireObject(report.agentPromptPack, "agentPromptPack", errors);
+    requireObject(report.marketingStarterPack, "marketingStarterPack", errors);
+    requireObject(report.salesPageCopyPack, "salesPageCopyPack", errors);
     requireArray(report.sevenDayPlan, "sevenDayPlan", errors, 7);
     return { isValid: errors.length === 0, errors };
 }
@@ -60,6 +64,28 @@ export function normalizeDeepReport(report) {
                 mvpDoneCriteria: report.agentExecutionStrategy.mvpDoneCriteria ?? [],
             }
             : undefined,
+        agentDevelopmentKit: {
+            ...report.agentDevelopmentKit,
+            suggestedFileStructure: report.agentDevelopmentKit.suggestedFileStructure ?? [],
+            coreComponents: report.agentDevelopmentKit.coreComponents ?? [],
+            stateAndDataFlow: report.agentDevelopmentKit.stateAndDataFlow ?? [],
+            implementationSteps: report.agentDevelopmentKit.implementationSteps ?? [],
+        },
+        agentPromptPack: {
+            ...report.agentPromptPack,
+        },
+        marketingStarterPack: {
+            ...report.marketingStarterPack,
+            audiencePainPoints: report.marketingStarterPack.audiencePainPoints ?? [],
+            launchChannels: report.marketingStarterPack.launchChannels ?? [],
+            contentIdeas: report.marketingStarterPack.contentIdeas ?? [],
+            validationMessages: report.marketingStarterPack.validationMessages ?? [],
+        },
+        salesPageCopyPack: {
+            ...report.salesPageCopyPack,
+            featureBullets: report.salesPageCopyPack.featureBullets ?? [],
+            faq: report.salesPageCopyPack.faq ?? [],
+        },
     };
 }
 function requireObject(value, path, errors) {

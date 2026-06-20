@@ -52,6 +52,17 @@ export function DeepReportView({ report }: DeepReportViewProps) {
         </DeepSection>
 
         <DeepSection title="AI Agent MVP 啟動包">
+          <div className="mb-5 rounded-md border border-slate-200 bg-slate-50 p-4">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 className="font-bold text-ink">取得可直接開工的 AI Agent Prompt</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  系統會把產品目標、功能需求、頁面、資料結構、限制與驗收條件整理成單一 Prompt。
+                </p>
+              </div>
+              <ButtonLink to="/agent-starter-kit">AI Agent 開工包</ButtonLink>
+            </div>
+          </div>
           <div className="grid gap-5 lg:grid-cols-2">
             <InfoBlock title="產品目標" value={report.agentMvpKit.productGoal} />
             <InfoBlock title="目標客群" value={report.agentMvpKit.targetAudience} />
@@ -127,6 +138,75 @@ export function DeepReportView({ report }: DeepReportViewProps) {
             </div>
           </DeepSection>
         )}
+
+        <DeepSection title="AI Agent 開發包">
+          <div className="grid gap-5 lg:grid-cols-2">
+            <InfoBlock title="專案簡介" value={report.agentDevelopmentKit.projectBrief} />
+            <InfoBlock
+              title="可直接交給 Agent 的 Brief"
+              value={report.agentDevelopmentKit.copyPasteAgentBrief}
+            />
+            <ListBlock
+              title="建議檔案結構"
+              items={report.agentDevelopmentKit.suggestedFileStructure}
+            />
+            <ListBlock title="核心元件" items={report.agentDevelopmentKit.coreComponents} />
+            <ListBlock
+              title="狀態與資料流"
+              items={report.agentDevelopmentKit.stateAndDataFlow}
+            />
+            <ListBlock
+              title="實作步驟"
+              items={report.agentDevelopmentKit.implementationSteps}
+            />
+          </div>
+        </DeepSection>
+
+        <DeepSection title="AI Agent Prompt Pack">
+          <div className="grid gap-5 lg:grid-cols-2">
+            <InfoBlock title="MVP 建立 Prompt" value={report.agentPromptPack.buildPrompt} />
+            <InfoBlock title="UI Prompt" value={report.agentPromptPack.uiPrompt} />
+            <InfoBlock title="資料結構 Prompt" value={report.agentPromptPack.dataPrompt} />
+            <InfoBlock title="QA 修正 Prompt" value={report.agentPromptPack.QARevisionPrompt} />
+          </div>
+        </DeepSection>
+
+        <DeepSection title="推廣啟動包">
+          <div className="grid gap-5 lg:grid-cols-2">
+            <InfoBlock title="產品定位" value={report.marketingStarterPack.positioning} />
+            <ListBlock
+              title="受眾痛點"
+              items={report.marketingStarterPack.audiencePainPoints}
+            />
+            <ListBlock
+              title="啟動推廣平台"
+              items={report.marketingStarterPack.launchChannels}
+            />
+            <ListBlock title="內容題材" items={report.marketingStarterPack.contentIdeas} />
+            <ListBlock
+              title="驗證訊息"
+              items={report.marketingStarterPack.validationMessages}
+            />
+          </div>
+        </DeepSection>
+
+        <DeepSection title="收費頁文案包">
+          <div className="grid gap-5 lg:grid-cols-2">
+            <InfoBlock title="Hero 標題" value={report.salesPageCopyPack.heroTitle} />
+            <InfoBlock title="Hero 副標題" value={report.salesPageCopyPack.heroSubtitle} />
+            <InfoBlock title="問題段落" value={report.salesPageCopyPack.problemSection} />
+            <InfoBlock title="解法段落" value={report.salesPageCopyPack.solutionSection} />
+            <ListBlock title="功能賣點" items={report.salesPageCopyPack.featureBullets} />
+            <InfoBlock title="證明段落" value={report.salesPageCopyPack.proofSection} />
+            <ListBlock
+              title="FAQ"
+              items={report.salesPageCopyPack.faq.map(
+                (item) => `${item.question}：${item.answer}`
+              )}
+            />
+            <InfoBlock title="最終 CTA" value={report.salesPageCopyPack.finalCta} />
+          </div>
+        </DeepSection>
       </div>
 
       <div className="mt-8 flex flex-wrap gap-3">

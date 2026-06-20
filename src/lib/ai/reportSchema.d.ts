@@ -350,6 +350,138 @@ export declare const geminiDeepReportResponseSchema: {
             };
             readonly required: readonly ["recommendedTech", "deploymentPlatform", "buildOrder", "estimatedPageCount", "estimatedFileCount", "mvpDoneCriteria"];
         };
+        readonly agentDevelopmentKit: {
+            readonly type: "OBJECT";
+            readonly properties: {
+                readonly projectBrief: {
+                    readonly type: "STRING";
+                };
+                readonly suggestedFileStructure: {
+                    readonly type: "ARRAY";
+                    readonly items: {
+                        readonly type: "STRING";
+                    };
+                };
+                readonly coreComponents: {
+                    readonly type: "ARRAY";
+                    readonly items: {
+                        readonly type: "STRING";
+                    };
+                };
+                readonly stateAndDataFlow: {
+                    readonly type: "ARRAY";
+                    readonly items: {
+                        readonly type: "STRING";
+                    };
+                };
+                readonly implementationSteps: {
+                    readonly type: "ARRAY";
+                    readonly items: {
+                        readonly type: "STRING";
+                    };
+                };
+                readonly copyPasteAgentBrief: {
+                    readonly type: "STRING";
+                };
+            };
+            readonly required: readonly ["projectBrief", "suggestedFileStructure", "coreComponents", "stateAndDataFlow", "implementationSteps", "copyPasteAgentBrief"];
+        };
+        readonly agentPromptPack: {
+            readonly type: "OBJECT";
+            readonly properties: {
+                readonly buildPrompt: {
+                    readonly type: "STRING";
+                };
+                readonly uiPrompt: {
+                    readonly type: "STRING";
+                };
+                readonly dataPrompt: {
+                    readonly type: "STRING";
+                };
+                readonly QARevisionPrompt: {
+                    readonly type: "STRING";
+                };
+            };
+            readonly required: readonly ["buildPrompt", "uiPrompt", "dataPrompt", "QARevisionPrompt"];
+        };
+        readonly marketingStarterPack: {
+            readonly type: "OBJECT";
+            readonly properties: {
+                readonly positioning: {
+                    readonly type: "STRING";
+                };
+                readonly audiencePainPoints: {
+                    readonly type: "ARRAY";
+                    readonly items: {
+                        readonly type: "STRING";
+                    };
+                };
+                readonly launchChannels: {
+                    readonly type: "ARRAY";
+                    readonly items: {
+                        readonly type: "STRING";
+                    };
+                };
+                readonly contentIdeas: {
+                    readonly type: "ARRAY";
+                    readonly items: {
+                        readonly type: "STRING";
+                    };
+                };
+                readonly validationMessages: {
+                    readonly type: "ARRAY";
+                    readonly items: {
+                        readonly type: "STRING";
+                    };
+                };
+            };
+            readonly required: readonly ["positioning", "audiencePainPoints", "launchChannels", "contentIdeas", "validationMessages"];
+        };
+        readonly salesPageCopyPack: {
+            readonly type: "OBJECT";
+            readonly properties: {
+                readonly heroTitle: {
+                    readonly type: "STRING";
+                };
+                readonly heroSubtitle: {
+                    readonly type: "STRING";
+                };
+                readonly problemSection: {
+                    readonly type: "STRING";
+                };
+                readonly solutionSection: {
+                    readonly type: "STRING";
+                };
+                readonly featureBullets: {
+                    readonly type: "ARRAY";
+                    readonly items: {
+                        readonly type: "STRING";
+                    };
+                };
+                readonly proofSection: {
+                    readonly type: "STRING";
+                };
+                readonly faq: {
+                    readonly type: "ARRAY";
+                    readonly items: {
+                        readonly type: "OBJECT";
+                        readonly properties: {
+                            readonly question: {
+                                readonly type: "STRING";
+                            };
+                            readonly answer: {
+                                readonly type: "STRING";
+                            };
+                        };
+                        readonly required: readonly ["question", "answer"];
+                    };
+                };
+                readonly finalCta: {
+                    readonly type: "STRING";
+                };
+            };
+            readonly required: readonly ["heroTitle", "heroSubtitle", "problemSection", "solutionSection", "featureBullets", "proofSection", "faq", "finalCta"];
+        };
     };
-    readonly required: readonly ["feasibility", "mvpFeatures", "sevenDayPlan", "agentMvpKit", "landingPageCopy", "pricing", "acquisition", "mvpReduction", "agentExecutionStrategy"];
+    readonly required: readonly ["feasibility", "mvpFeatures", "sevenDayPlan", "agentMvpKit", "landingPageCopy", "pricing", "acquisition", "mvpReduction", "agentExecutionStrategy", "agentDevelopmentKit", "agentPromptPack", "marketingStarterPack", "salesPageCopyPack"];
 };

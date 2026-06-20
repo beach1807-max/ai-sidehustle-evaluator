@@ -53,5 +53,39 @@ export type DeepReport = {
         estimatedFileCount: string;
         mvpDoneCriteria: string[];
     };
+    agentDevelopmentKit: {
+        projectBrief: string;
+        suggestedFileStructure: string[];
+        coreComponents: string[];
+        stateAndDataFlow: string[];
+        implementationSteps: string[];
+        copyPasteAgentBrief: string;
+    };
+    agentPromptPack: {
+        buildPrompt: string;
+        uiPrompt: string;
+        dataPrompt: string;
+        QARevisionPrompt: string;
+    };
+    marketingStarterPack: {
+        positioning: string;
+        audiencePainPoints: string[];
+        launchChannels: string[];
+        contentIdeas: string[];
+        validationMessages: string[];
+    };
+    salesPageCopyPack: {
+        heroTitle: string;
+        heroSubtitle: string;
+        problemSection: string;
+        solutionSection: string;
+        featureBullets: string[];
+        proofSection: string;
+        faq: {
+            question: string;
+            answer: string;
+        }[];
+        finalCta: string;
+    };
 };
 export declare const sampleDeepReport: DeepReport;
