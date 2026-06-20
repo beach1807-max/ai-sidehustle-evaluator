@@ -48,6 +48,7 @@ export function ReportPage() {
     <ReportView
       report={report}
       displayedIdea={userIdea}
+      exampleReportId={activeReportId}
       notice="目前為 Mock 版，報告內容為範例資料，之後會接上 AI API 產生客製化分析。"
     />
   );

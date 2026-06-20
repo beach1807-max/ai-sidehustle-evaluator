@@ -1,0 +1,540 @@
+import type { DeepReport } from "./deepReport";
+
+export const exampleDeepReports: Record<string, DeepReport> = {
+  "pet-food-analysis": {
+    feasibility: {
+      soloDeveloperFit:
+        "適合一人先做 MVP，但必須把定位限制在一般性成分分析與風險提醒，不能做醫療診斷、治療建議或品牌保證推薦。",
+      estimatedBuildTime:
+        "7 天可完成可展示版本；14 天內可整理出較完整的輸入、分析結果、免責聲明與 README。",
+      mainRisks: [
+        "容易誤踩寵物醫療、營養療效與診斷責任",
+        "若一開始建立完整飼料品牌資料庫，維護成本會快速增加",
+        "使用者可能把一般性提醒誤解成獸醫建議",
+      ],
+      recommendation:
+        "建議縮小後執行。第一版只做寵物條件輸入、飼料成分貼上、一般性分析、風險提醒與免責聲明，不做品牌排名與醫療判斷。",
+    },
+    mvpFeatures: {
+      mustHave: [
+        "寵物基本條件輸入",
+        "飼料成分與營養標示貼上欄位",
+        "mockAnalyzeFood() 假分析函式",
+        "一般性風險提醒與免責聲明",
+        "可複製的分析結果",
+      ],
+      later: [
+        "常見成分說明資料庫",
+        "多寵物資料保存",
+        "飼料比較功能",
+        "使用者回饋表單",
+      ],
+      notRecommended: [
+        "醫療診斷",
+        "品牌排行榜",
+        "完整飼料資料庫",
+        "獸醫問診",
+        "會員系統",
+        "正式付款流程",
+      ],
+    },
+    sevenDayPlan: [
+      { day: "Day 1", task: "定義輸入欄位：寵物種類、年齡、狀況、成分表與使用者擔心的問題。" },
+      { day: "Day 2", task: "建立首頁、輸入表單、結果區塊與免責聲明文案。" },
+      { day: "Day 3", task: "建立 mockAnalyzeFood()，回傳成分摘要、注意事項與一般性建議。" },
+      { day: "Day 4", task: "完成結果卡片、風險提醒、可複製文字與重新分析流程。" },
+      { day: "Day 5", task: "加入三份固定範例資料，測試不同寵物狀況的輸出差異。" },
+      { day: "Day 6", task: "補 README、.env.example、第三方服務 TODO 與部署說明。" },
+      { day: "Day 7", task: "請 5 位飼主試用，確認是否理解這不是醫療建議。" },
+    ],
+    agentMvpKit: {
+      productGoal:
+        "建立一個讓飼主貼上飼料成分與寵物條件後，取得一般性成分分析、風險提醒與下一步注意事項的單頁網站。",
+      targetAudience:
+        "想先看懂飼料成分、但不希望被品牌廣告牽著走的貓狗飼主。",
+      mvpRequirements: [
+        "使用者可輸入寵物種類、年齡、體重、目前狀況與飼料成分",
+        "系統以 mock data 產生一般性分析結果",
+        "結果必須包含免責聲明，提醒不可取代獸醫",
+        "使用者可複製分析結果",
+      ],
+      pageRequirements: ["首頁", "分析輸入頁", "分析結果頁", "範例報告區"],
+      uiRequirements: [
+        "語氣務實，不使用醫療保證文案",
+        "結果以卡片分區：成分摘要、注意事項、下一步",
+        "免責聲明需醒目但不恐嚇",
+        "手機版欄位可讀且好輸入",
+      ],
+      dataStructure: [
+        "PetProfile: petType, age, weight, condition",
+        "FoodInput: ingredientsText, nutritionText, concern",
+        "FoodAnalysisResult: summary, possibleConcerns, generalTips, disclaimer",
+      ],
+      technicalConstraints: [
+        "使用 React + Vite",
+        "第一版只使用 mockAnalyzeFood，不接 AI API",
+        "不建立正式飼料資料庫",
+        "不新增登入、資料庫、金流或會員系統",
+      ],
+      acceptanceCriteria: [
+        "使用者可完成輸入並看到分析結果",
+        "結果包含一般性提醒與免責聲明",
+        "沒有任何醫療診斷或療效保證",
+        "即使沒有 API Key 也可啟動並展示完整流程",
+      ],
+    },
+    landingPageCopy: {
+      headline: "先看懂飼料成分，再決定要不要換糧",
+      subheadline:
+        "貼上成分表與寵物狀況，取得一般性分析、注意事項與可複製的飼料檢查摘要。",
+      features: ["成分摘要", "風險提醒", "寵物狀況對照", "非醫療免責聲明"],
+      cta: "開始檢查飼料成分",
+    },
+    pricing: {
+      freePlan: "免費顯示成分摘要與 2 到 3 個主要注意事項。",
+      oneTimePrice: "完整開工包可測 NT$49～99，提供更完整分析版型與開發任務。",
+      futureSubscription: "不建議第一版做訂閱；除非未來有穩定資料更新與多寵物紀錄需求。",
+    },
+    acquisition: {
+      firstUsers: ["新手貓狗飼主", "正在換飼料的飼主", "有軟便或挑食困擾的飼主"],
+      suitablePlatforms: ["Facebook 寵物社團", "Dcard 寵物版", "Threads", "Instagram 限動問答"],
+      lowCostPromotion: [
+        "公開拆解一款飼料成分表",
+        "分享換糧前檢查清單",
+        "提供 5 份人工成分摘要換取回饋",
+      ],
+    },
+    mvpReduction: {
+      sevenDayScope:
+        "只做單頁輸入、mock 分析結果、免責聲明與可複製報告，不做完整平台或品牌資料庫。",
+      remove: ["品牌排行榜", "醫療診斷", "會員系統", "付款流程", "完整飼料資料庫"],
+      keep: ["寵物條件輸入", "成分貼上", "mock 分析", "風險提醒", "可複製結果"],
+    },
+    agentExecutionStrategy: {
+      recommendedTech: ["React", "Vite", "Tailwind CSS", "localStorage", "mock data"],
+      deploymentPlatform: "Cloudflare Pages",
+      buildOrder: ["首頁", "輸入表單", "mock 分析函式", "結果頁", "README 與環境變數範例"],
+      estimatedPageCount: "3 頁",
+      estimatedFileCount: "8～12 個檔案",
+      mvpDoneCriteria: [
+        "可以輸入寵物條件與成分",
+        "可以顯示 mock 分析結果",
+        "可以複製結果",
+        "沒有正式第三方服務也能正常啟動",
+      ],
+    },
+    agentDevelopmentKit: {
+      projectBrief:
+        "建立一個寵物飼料成分檢查 MVP，先用假資料與規則式 mock function 顯示一般性分析，不接正式資料庫或 AI API。",
+      suggestedFileStructure: [
+        "src/pages/HomePage.tsx",
+        "src/pages/FoodAnalyzerPage.tsx",
+        "src/components/FoodInputForm.tsx",
+        "src/components/FoodAnalysisResult.tsx",
+        "src/lib/mockAnalyzeFood.ts",
+        "src/data/sampleFoodReports.ts",
+        ".env.example",
+        "README.md",
+      ],
+      coreComponents: ["寵物條件表單", "成分輸入框", "結果卡片", "免責聲明", "複製按鈕"],
+      stateAndDataFlow: [
+        "使用者填寫表單",
+        "前端呼叫 mockAnalyzeFood()",
+        "結果存在元件 state",
+        "使用者可複製文字或重新輸入",
+      ],
+      implementationSteps: [
+        "建立表單與基本驗證",
+        "建立 mockAnalyzeFood() 回傳固定結構",
+        "建立結果卡片與免責聲明",
+        "加入三份範例分析",
+        "補 README 與 .env.example",
+      ],
+      copyPasteAgentBrief:
+        "請建立 React + Vite 的寵物飼料分析 MVP。第一版只使用 mockAnalyzeFood()，不接 AI API、資料庫、金流或會員。使用者可輸入寵物條件與飼料成分，看到一般性分析、注意事項、免責聲明並複製結果。",
+    },
+    agentPromptPack: {
+      buildPrompt:
+        "請依照 agentMvpKit 建立寵物飼料分析 MVP，優先完成輸入、mock 分析、結果顯示與免責聲明。",
+      uiPrompt:
+        "請設計務實、清楚、偏保守的寵物飼料分析介面，不使用醫療診斷或保證改善文案。",
+      dataPrompt:
+        "請建立 PetProfile、FoodInput、FoodAnalysisResult 型別與三份 sampleFoodReports mock data。",
+      QARevisionPrompt:
+        "請檢查頁面是否避免醫療宣稱、是否不需要 API Key、是否可在本機直接展示完整流程。",
+    },
+    marketingStarterPack: {
+      positioning: "給飼主的飼料成分初步檢查工具，不取代獸醫與營養師。",
+      audiencePainPoints: ["看不懂成分表", "怕買錯飼料", "不確定是否需要換糧"],
+      launchChannels: ["寵物社團", "Dcard 寵物版", "Threads", "IG 寵物帳號"],
+      contentIdeas: ["飼料成分表怎麼看", "換糧前要檢查什麼", "哪些說法不能當醫療建議"],
+      validationMessages: [
+        "我做了一個飼料成分檢查工具，想找 5 位飼主測試是否看得懂結果。",
+        "如果你正在換飼料，我可以幫你整理一份非醫療的成分摘要。",
+      ],
+    },
+    salesPageCopyPack: {
+      heroTitle: "把飼料成分表變成看得懂的檢查摘要",
+      heroSubtitle:
+        "輸入寵物狀況與飼料成分，取得一般性分析、注意事項與不取代獸醫的風險提醒。",
+      problemSection: "多數飼主看得懂品牌名稱，卻看不懂成分表與營養標示的取捨。",
+      solutionSection:
+        "這個工具先用固定規則整理成分摘要，幫飼主更有方向地跟獸醫或店家討論。",
+      featureBullets: ["成分摘要", "寵物條件對照", "注意事項", "免責聲明"],
+      proofSection: "第一版適合先用範例資料驗證飼主是否願意閱讀與分享結果。",
+      faq: [
+        { question: "這能取代獸醫嗎？", answer: "不能。它只提供一般性資訊整理。" },
+        { question: "會推薦唯一最佳飼料嗎？", answer: "不會，第一版避免品牌排名與醫療保證。" },
+      ],
+      finalCta: "開始檢查飼料成分",
+    },
+  },
+  "ai-travel-planner": {
+    feasibility: {
+      soloDeveloperFit:
+        "適合做小型 MVP，但必須避開訂房、地圖串接、會員收藏與即時票價，否則很快變成完整旅遊平台。",
+      estimatedBuildTime: "7 天可完成目的地輸入、mock 行程生成、每日卡片與複製文字功能。",
+      mainRisks: [
+        "旅遊規劃市場競爭高，普通行程很容易被免費 AI 工具取代",
+        "即時資料、票價、營業時間與交通資訊會造成維護壓力",
+        "若一開始做地圖與訂房，範圍會超過一人 MVP",
+      ],
+      recommendation:
+        "建議做小型工具驗證。第一版只做目的地、天數、偏好輸入，產生每日行程卡片與可複製文字。",
+    },
+    mvpFeatures: {
+      mustHave: [
+        "目的地、天數、預算與偏好輸入",
+        "mockGenerateItinerary() 假行程產生函式",
+        "每日行程卡片",
+        "可複製文字版行程",
+        "資訊需自行確認的提醒",
+      ],
+      later: ["地圖預覽", "行程拖拉排序", "多人協作", "收藏行程", "匯出 PDF"],
+      notRecommended: ["訂房串接", "地圖 API", "即時票價", "會員系統", "完整景點資料庫"],
+    },
+    sevenDayPlan: [
+      { day: "Day 1", task: "定義輸入欄位：目的地、天數、同行者、預算、偏好與不想去的地方。" },
+      { day: "Day 2", task: "建立首頁、輸入表單與產生行程按鈕。" },
+      { day: "Day 3", task: "建立 mockGenerateItinerary()，依偏好回傳三種範例行程。" },
+      { day: "Day 4", task: "完成每日行程卡片、備案區塊與複製全文功能。" },
+      { day: "Day 5", task: "加入行程提醒：營業時間、交通、票價需出發前自行確認。" },
+      { day: "Day 6", task: "補 README、.env.example、部署方式與待串接 API 的 TODO。" },
+      { day: "Day 7", task: "找 5 位正在規劃旅行的人測試輸入與複製流程。" },
+    ],
+    agentMvpKit: {
+      productGoal:
+        "建立一個讓使用者輸入目的地、天數與偏好後，產生可複製每日行程草稿的網站框架。",
+      targetAudience: "想快速取得自由行草稿、再自行微調的上班族、親子旅遊者與新手自由行使用者。",
+      mvpRequirements: [
+        "使用者可輸入目的地、天數、旅遊偏好與不想安排的內容",
+        "系統使用 mock function 產生每日行程",
+        "每一天都顯示上午、下午、晚上建議",
+        "提供一鍵複製文字行程",
+      ],
+      pageRequirements: ["首頁", "行程輸入頁", "行程結果頁", "範例行程頁"],
+      uiRequirements: [
+        "輸入欄位密度適中",
+        "每日行程卡片容易掃讀",
+        "複製按鈕清楚",
+        "避免看起來像訂房平台",
+      ],
+      dataStructure: [
+        "TripInput: destination, days, travelerType, budget, preferences, avoid",
+        "ItineraryDay: day, morning, afternoon, evening, notes",
+        "ItineraryResult: title, summary, days, copyText",
+      ],
+      technicalConstraints: [
+        "使用 React + Vite",
+        "使用 mockGenerateItinerary，不串 Google Maps",
+        "不接訂房、交通或票價 API",
+        "不新增登入、資料庫、金流或會員系統",
+      ],
+      acceptanceCriteria: [
+        "可輸入旅行條件並看到每日行程",
+        "每份行程可複製成純文字",
+        "不需要任何第三方 API 即可啟動",
+        "結果清楚提醒資訊需自行確認",
+      ],
+    },
+    landingPageCopy: {
+      headline: "先產生一份可討論的自由行草稿",
+      subheadline:
+        "輸入目的地、天數與偏好，快速得到每日行程卡片與可複製文字。",
+      features: ["偏好輸入", "每日行程卡片", "雨天備案", "一鍵複製"],
+      cta: "產生我的行程草稿",
+    },
+    pricing: {
+      freePlan: "免費顯示簡短三日行程摘要與一個備案。",
+      oneTimePrice: "完整行程包可測 NT$49～99，提供每日安排、備案與可複製版本。",
+      futureSubscription: "不建議第一版做訂閱；除非未來能提供持續行程管理或團隊協作。",
+    },
+    acquisition: {
+      firstUsers: ["正在規劃自由行的人", "親子旅遊使用者", "第一次去日本或韓國自由行的人"],
+      suitablePlatforms: ["Facebook 旅遊社團", "Dcard 旅遊版", "Threads", "PTT travel"],
+      lowCostPromotion: [
+        "公開產生一份東京三日親子行程",
+        "比較普通 AI 行程與偏好化行程差異",
+        "提供前 10 位免費行程草稿換回饋",
+      ],
+    },
+    mvpReduction: {
+      sevenDayScope:
+        "只做輸入、mock 行程生成、每日卡片與複製功能，不做即時地圖、訂房或會員保存。",
+      remove: ["地圖 API", "訂房服務", "會員收藏", "即時票價", "多人共編"],
+      keep: ["行程輸入", "mock 產生", "每日卡片", "備案提醒", "複製文字"],
+    },
+    agentExecutionStrategy: {
+      recommendedTech: ["React", "Vite", "Tailwind CSS", "localStorage", "mock data"],
+      deploymentPlatform: "Cloudflare Pages",
+      buildOrder: ["首頁", "輸入表單", "mock 行程函式", "行程結果頁", "複製功能"],
+      estimatedPageCount: "3 頁",
+      estimatedFileCount: "8～12 個檔案",
+      mvpDoneCriteria: [
+        "可以輸入目的地與偏好",
+        "可以產生每日行程卡片",
+        "可以複製文字版行程",
+        "沒有外部 API 也能正常展示",
+      ],
+    },
+    agentDevelopmentKit: {
+      projectBrief:
+        "建立一個 AI 旅遊行程規劃工具 MVP，但第一版只用 mockGenerateItinerary() 模擬行程，不接地圖、訂房或即時票價。",
+      suggestedFileStructure: [
+        "src/pages/HomePage.tsx",
+        "src/pages/TripPlannerPage.tsx",
+        "src/components/TripInputForm.tsx",
+        "src/components/ItineraryResult.tsx",
+        "src/lib/mockGenerateItinerary.ts",
+        "src/data/sampleItineraries.ts",
+        ".env.example",
+        "README.md",
+      ],
+      coreComponents: ["旅行條件表單", "每日行程卡片", "備案提醒", "複製按鈕", "資訊確認提醒"],
+      stateAndDataFlow: [
+        "使用者填寫 TripInput",
+        "前端呼叫 mockGenerateItinerary()",
+        "行程結果存在元件 state",
+        "使用者可複製完整行程文字",
+      ],
+      implementationSteps: [
+        "建立輸入表單與欄位驗證",
+        "建立 mockGenerateItinerary()",
+        "建立每日行程卡片",
+        "加入複製全文功能",
+        "補 README 與未來 API TODO",
+      ],
+      copyPasteAgentBrief:
+        "請建立 React + Vite 的旅遊行程規劃 MVP。第一版只使用 mockGenerateItinerary()，不接地圖 API、訂房服務、資料庫、會員或金流。使用者可輸入目的地、天數與偏好，看到每日行程卡片並複製文字。",
+    },
+    agentPromptPack: {
+      buildPrompt:
+        "請依照 agentMvpKit 建立旅遊行程規劃 MVP，優先完成輸入、mock 行程生成、每日卡片與複製功能。",
+      uiPrompt:
+        "請設計清楚、輕量、適合旅行規劃的行程卡片 UI，不要做成訂房或完整旅遊平台。",
+      dataPrompt:
+        "請建立 TripInput、ItineraryDay、ItineraryResult 型別與三份 sampleItineraries mock data。",
+      QARevisionPrompt:
+        "請檢查是否沒有呼叫地圖、訂房、票價或 AI API，並確認沒有登入與資料庫需求。",
+    },
+    marketingStarterPack: {
+      positioning: "給自由行新手的第一版行程草稿工具，先幫你整理可討論的路線。",
+      audiencePainPoints: ["不知如何排每日行程", "怕安排太趕", "想快速得到可修改草稿"],
+      launchChannels: ["旅遊社團", "Dcard 旅遊版", "Threads", "個人部落格"],
+      contentIdeas: ["東京三日親子行程範例", "雨天備案怎麼排", "自由行不要一開始塞太滿"],
+      validationMessages: [
+        "我做了一個行程草稿工具，想找正在規劃旅行的人測試。",
+        "給我目的地與偏好，我可以產一份可複製的行程草稿給你試用。",
+      ],
+    },
+    salesPageCopyPack: {
+      heroTitle: "用 3 分鐘產生可討論的自由行草稿",
+      heroSubtitle:
+        "輸入目的地、天數與偏好，取得每日行程卡片、備案與可複製文字。",
+      problemSection: "規劃自由行最卡的不是找景點，而是把景點排成合理的一天。",
+      solutionSection:
+        "這個工具先給你一份可修改的行程草稿，讓你不用從空白頁開始。",
+      featureBullets: ["每日安排", "偏好化建議", "備案提醒", "一鍵複製"],
+      proofSection: "第一版可先用 mock 行程驗證使用者是否願意保存與分享行程。",
+      faq: [
+        { question: "會幫我訂房嗎？", answer: "不會。第一版只產生行程草稿。" },
+        { question: "資訊保證正確嗎？", answer: "不保證，出發前仍需自行確認營業時間與票價。" },
+      ],
+      finalCta: "產生行程草稿",
+    },
+  },
+  "ai-resume-checker": {
+    feasibility: {
+      soloDeveloperFit:
+        "適合一人做 MVP，因為輸入與輸出都可標準化；但競爭高，必須讓報告比直接問 AI 更具體、更可執行。",
+      estimatedBuildTime: "7 天可完成履歷貼上、mock 診斷、修改建議、面試重點與複製結果。",
+      mainRisks: [
+        "求職工具競爭高，普通建議缺乏差異",
+        "若承諾提高錄取率，會造成不必要責任",
+        "若保存履歷資料，會增加隱私與資料安全負擔",
+      ],
+      recommendation:
+        "建議縮小後執行。第一版只做履歷文字貼上、問題診斷、修改建議與面試準備提醒，不做完整求職平台。",
+    },
+    mvpFeatures: {
+      mustHave: [
+        "履歷文字貼上欄位",
+        "目標職缺或求職方向輸入",
+        "mockAnalyzeResume() 假分析函式",
+        "問題清單、修改建議與面試重點",
+        "隱私與不保證錄取提醒",
+      ],
+      later: ["履歷版本比較", "職缺關鍵字比對", "PDF 匯出", "改寫範例庫"],
+      notRecommended: ["會員履歷庫", "職缺媒合平台", "保證錄取文案", "人工無限修改", "正式資料庫"],
+    },
+    sevenDayPlan: [
+      { day: "Day 1", task: "定義輸入欄位：履歷文字、目標職缺、檢查重點與使用者年資。" },
+      { day: "Day 2", task: "建立首頁、履歷輸入表單與隱私提醒。" },
+      { day: "Day 3", task: "建立 mockAnalyzeResume()，回傳問題清單、修改建議與面試重點。" },
+      { day: "Day 4", task: "完成結果頁：優先修改項目、句子改寫方向與可複製摘要。" },
+      { day: "Day 5", task: "加入三份範例履歷分析資料，測試不同職務方向。" },
+      { day: "Day 6", task: "補 README、.env.example、資料隱私說明與未來 AI API TODO。" },
+      { day: "Day 7", task: "找 5 位求職者試用，確認建議是否具體且不過度承諾。" },
+    ],
+    agentMvpKit: {
+      productGoal:
+        "建立一個讓使用者貼上履歷文字後，取得問題診斷、修改建議與面試準備重點的單頁 MVP。",
+      targetAudience: "正在求職、轉職或準備第一份履歷的學生、上班族與轉職者。",
+      mvpRequirements: [
+        "使用者可貼上履歷文字並輸入目標職缺",
+        "系統以 mock function 產生履歷健檢結果",
+        "結果需包含問題清單、修改建議與面試重點",
+        "提醒使用者不要貼上過度敏感個資",
+      ],
+      pageRequirements: ["首頁", "履歷輸入頁", "健檢結果頁", "範例報告頁"],
+      uiRequirements: [
+        "表單需明確提醒隱私",
+        "結果以優先順序呈現",
+        "語氣具體但不保證錄取",
+        "手機版也能閱讀長文字",
+      ],
+      dataStructure: [
+        "ResumeInput: resumeText, targetRole, seniority, focusArea",
+        "ResumeIssue: title, severity, evidence, suggestion",
+        "ResumeAnalysisResult: score, issues, rewriteTips, interviewFocus",
+      ],
+      technicalConstraints: [
+        "使用 React + Vite",
+        "使用 mockAnalyzeResume，不接 AI API",
+        "不儲存履歷到資料庫",
+        "不新增登入、資料庫、金流或會員系統",
+      ],
+      acceptanceCriteria: [
+        "可貼上履歷並看到健檢結果",
+        "結果包含問題清單、修改建議與面試重點",
+        "頁面提醒不要上傳敏感個資",
+        "不需要 API Key 也可完整展示",
+      ],
+    },
+    landingPageCopy: {
+      headline: "把履歷問題整理成可修改的清單",
+      subheadline:
+        "貼上履歷與目標職缺，取得優先修改項目、改寫方向與面試準備重點。",
+      features: ["問題診斷", "修改建議", "面試重點", "隱私提醒"],
+      cta: "開始健檢履歷",
+    },
+    pricing: {
+      freePlan: "免費顯示 3 個主要履歷問題與簡短修改方向。",
+      oneTimePrice: "完整履歷健檢可測 NT$99～199，提供完整問題清單與改寫方向。",
+      futureSubscription: "不建議第一版做訂閱；除非未來加入職缺追蹤或多版本管理。",
+    },
+    acquisition: {
+      firstUsers: ["正在找第一份工作的人", "轉職者", "想改履歷但不知道從何開始的人"],
+      suitablePlatforms: ["Dcard 工作版", "LinkedIn", "Threads", "大學生社群"],
+      lowCostPromotion: [
+        "公開拆解一份匿名履歷",
+        "分享履歷常見空泛句子",
+        "提供前 5 位免費履歷健檢換回饋",
+      ],
+    },
+    mvpReduction: {
+      sevenDayScope:
+        "只做履歷貼上、mock 診斷、修改建議、面試重點與可複製結果，不做履歷庫或求職平台。",
+      remove: ["會員履歷庫", "職缺媒合", "保證錄取", "人工無限修改", "正式資料庫"],
+      keep: ["履歷貼上", "目標職缺", "mock 分析", "修改建議", "面試重點"],
+    },
+    agentExecutionStrategy: {
+      recommendedTech: ["React", "Vite", "Tailwind CSS", "localStorage", "mock data"],
+      deploymentPlatform: "Cloudflare Pages",
+      buildOrder: ["首頁", "履歷輸入表單", "mock 分析函式", "健檢結果頁", "隱私提醒"],
+      estimatedPageCount: "3 頁",
+      estimatedFileCount: "8～12 個檔案",
+      mvpDoneCriteria: [
+        "可以貼上履歷文字",
+        "可以顯示 mock 健檢結果",
+        "可以看到面試準備重點",
+        "沒有登入與資料庫也能完整展示",
+      ],
+    },
+    agentDevelopmentKit: {
+      projectBrief:
+        "建立一個 AI 履歷健檢 MVP，但第一版只使用 mockAnalyzeResume() 模擬分析，不接登入、資料庫或 AI API。",
+      suggestedFileStructure: [
+        "src/pages/HomePage.tsx",
+        "src/pages/ResumeCheckerPage.tsx",
+        "src/components/ResumeInputForm.tsx",
+        "src/components/ResumeAnalysisResult.tsx",
+        "src/lib/mockAnalyzeResume.ts",
+        "src/data/sampleResumeReports.ts",
+        ".env.example",
+        "README.md",
+      ],
+      coreComponents: ["履歷輸入表單", "隱私提醒", "問題清單", "修改建議卡片", "面試重點"],
+      stateAndDataFlow: [
+        "使用者貼上履歷並輸入目標職缺",
+        "前端呼叫 mockAnalyzeResume()",
+        "分析結果存在元件 state",
+        "使用者閱讀建議並複製摘要",
+      ],
+      implementationSteps: [
+        "建立履歷輸入與目標職缺欄位",
+        "建立 mockAnalyzeResume()",
+        "建立結果頁與優先修改清單",
+        "加入面試準備重點",
+        "補 README、隱私提醒與 .env.example",
+      ],
+      copyPasteAgentBrief:
+        "請建立 React + Vite 的履歷健檢 MVP。第一版只使用 mockAnalyzeResume()，不接 AI API、登入、資料庫、會員或金流。使用者可貼上履歷文字與目標職缺，看到問題清單、修改建議、面試重點與隱私提醒。",
+    },
+    agentPromptPack: {
+      buildPrompt:
+        "請依照 agentMvpKit 建立履歷健檢 MVP，優先完成履歷輸入、mock 分析、結果卡片與隱私提醒。",
+      uiPrompt:
+        "請設計清楚、專業、偏務實的履歷健檢介面，不保證錄取，不鼓勵上傳敏感個資。",
+      dataPrompt:
+        "請建立 ResumeInput、ResumeIssue、ResumeAnalysisResult 型別與三份 sampleResumeReports mock data。",
+      QARevisionPrompt:
+        "請檢查是否沒有登入、資料庫與 AI API 依賴，並確認文案沒有保證錄取或面試機會。",
+    },
+    marketingStarterPack: {
+      positioning: "給求職者的履歷初步健檢工具，把模糊問題整理成可修改清單。",
+      audiencePainPoints: ["不知道履歷哪裡弱", "不知道如何描述成果", "面試前不知道該準備什麼"],
+      launchChannels: ["Dcard 工作版", "LinkedIn", "Threads", "校園社群"],
+      contentIdeas: ["履歷常見 5 種空泛描述", "如何把工作內容改成成果", "面試前該回頭看履歷哪些地方"],
+      validationMessages: [
+        "我做了一個履歷健檢工具，想找 5 位求職者測試建議是否具體。",
+        "你可以貼匿名履歷片段，我會用工具產一份不保證錄取的修改方向。",
+      ],
+    },
+    salesPageCopyPack: {
+      heroTitle: "把履歷問題整理成可以修改的下一步",
+      heroSubtitle:
+        "貼上履歷與目標職缺，取得問題診斷、改寫方向與面試準備重點。",
+      problemSection: "很多履歷不是經歷不夠，而是成果、證據與職缺連結沒有說清楚。",
+      solutionSection:
+        "這個工具會先用固定格式幫你找出優先修改項目，讓你知道下一步該改哪裡。",
+      featureBullets: ["問題清單", "改寫方向", "面試重點", "隱私提醒"],
+      proofSection: "第一版可先用 mock 分析驗證使用者是否覺得建議比泛用 AI 回答更具體。",
+      faq: [
+        { question: "會保證錄取嗎？", answer: "不會。它只提供履歷修改方向與準備提醒。" },
+        { question: "會保存我的履歷嗎？", answer: "第一版不做資料庫，示範版只在前端流程中處理。" },
+      ],
+      finalCta: "開始健檢履歷",
+    },
+  },
+};

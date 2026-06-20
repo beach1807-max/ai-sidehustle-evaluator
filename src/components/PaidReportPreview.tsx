@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { exampleDeepReports } from "../data/exampleDeepReports";
+import { normalizeDeepReport, validateDeepReport } from "../lib/validateDeepReport";
 
 const paidReportItems = [
   "7 天 MVP 行動計畫",
@@ -12,6 +14,7 @@ const paidReportItems = [
 
 type PaidReportPreviewProps = {
   displayedIdea: string;
+  exampleReportId?: string;
 };
 
 type DeepReportApiResponse =
@@ -30,12 +33,37 @@ type DeepReportApiResponse =
 
 const deepReportStorageKey = "deepReportPreview";
 
-export function PaidReportPreview({ displayedIdea }: PaidReportPreviewProps) {
+export function PaidReportPreview({
+  displayedIdea,
+  exampleReportId,
+}: PaidReportPreviewProps) {
   const navigate = useNavigate();
   const enableDeepReport = import.meta.env.VITE_ENABLE_DEEP_REPORT === "true";
+  const exampleDeepReport = exampleReportId
+    ? exampleDeepReports[exampleReportId]
+    : undefined;
   const [showComingSoonMessage, setShowComingSoonMessage] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState("");
+
+  function openStaticExampleStarterKit() {
+    if (!exampleDeepReport) {
+      return;
+    }
+
+    setShowComingSoonMessage(false);
+    setError("");
+
+    const normalizedReport = normalizeDeepReport(exampleDeepReport);
+    const validation = validateDeepReport(normalizedReport);
+    if (!validation.isValid) {
+      setError(`固定範例 Deep Report 驗證失敗：${validation.errors.join("；")}`);
+      return;
+    }
+
+    localStorage.setItem(deepReportStorageKey, JSON.stringify(normalizedReport));
+    navigate("/report/deep-preview");
+  }
 
   async function generateDeepReport() {
     setShowComingSoonMessage(false);
@@ -80,6 +108,12 @@ export function PaidReportPreview({ displayedIdea }: PaidReportPreviewProps) {
           <p className="mt-3 leading-8 text-slate-600">
             系統會把你的副業點子整理成一份 AI 看得懂的開發說明書，包含 MVP 功能、7 天行動計畫、AI Agent 開工包、推廣文案與收費建議。
           </p>
+          <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 p-4 text-sm leading-7 text-signal">
+            <p className="font-semibold text-ink">這不是單純買一份分析報告。</p>
+            <p className="mt-2">
+              你會拿到一份可以交給 AI 開發工具的 MVP（最小可行產品 / 第一版可測試網站）開工說明書，幫你把副業點子整理成功能、頁面、開發步驟與驗收條件。
+            </p>
+          </div>
         </div>
 
         <div className="rounded-md border border-slate-200 bg-slate-50 p-5">
@@ -97,7 +131,15 @@ export function PaidReportPreview({ displayedIdea }: PaidReportPreviewProps) {
 
       <div className="mt-6 flex flex-col gap-4 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-lg font-bold text-ink">單次完整開工包：NT$49～99</p>
-        {enableDeepReport ? (
+        {exampleDeepReport ? (
+          <button
+            type="button"
+            onClick={openStaticExampleStarterKit}
+            className="focus-ring inline-flex items-center justify-center rounded-md bg-ink px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700"
+          >
+            產生完整開工包
+          </button>
+        ) : enableDeepReport ? (
           <button
             type="button"
             onClick={generateDeepReport}
@@ -112,10 +154,16 @@ export function PaidReportPreview({ displayedIdea }: PaidReportPreviewProps) {
             onClick={() => setShowComingSoonMessage(true)}
             className="focus-ring inline-flex items-center justify-center rounded-md bg-ink px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700"
           >
-            我想要完整開工包
+            產生完整開工包
           </button>
         )}
       </div>
+
+      {exampleDeepReport && (
+        <p className="mt-3 text-sm leading-6 text-slate-500">
+          範例報告會直接顯示預設好的完整開工包，不會消耗 AI 產生次數。
+        </p>
+      )}
 
       {showComingSoonMessage && (
         <p className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm font-medium leading-6 text-emerald-700">

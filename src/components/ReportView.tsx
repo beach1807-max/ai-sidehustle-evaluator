@@ -11,9 +11,15 @@ type ReportViewProps = {
   report: MockReport;
   displayedIdea: string;
   notice?: string;
+  exampleReportId?: string;
 };
 
-export function ReportView({ report, displayedIdea, notice }: ReportViewProps) {
+export function ReportView({
+  report,
+  displayedIdea,
+  notice,
+  exampleReportId,
+}: ReportViewProps) {
   const hasPricingTiers =
     Array.isArray(report.pricingTiers) && report.pricingTiers.length > 0;
 
@@ -119,7 +125,10 @@ export function ReportView({ report, displayedIdea, notice }: ReportViewProps) {
           本報告由 AI 根據你的輸入產生，僅供副業規劃與 MVP 驗證參考，不保證市場需求、收入結果、法律合規或平台審核結果。若點子涉及健康、金融、法律、寵物照護等高風險領域，請再尋求專業判斷。
         </div>
 
-        <PaidReportPreview displayedIdea={displayedIdea} />
+        <PaidReportPreview
+          displayedIdea={displayedIdea}
+          exampleReportId={exampleReportId}
+        />
       </div>
 
       <div className="mt-8 flex flex-wrap gap-3">
