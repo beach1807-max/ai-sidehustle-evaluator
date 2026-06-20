@@ -1,7 +1,9 @@
+import { buildDeepReportPrompt } from "../deepReportPrompt";
 import { buildEvaluationPrompt } from "../promptTemplate";
+import { normalizeDeepReport, validateDeepReport } from "../validateDeepReport";
 import { normalizeReportData, validateReportData } from "../validateReport";
 import { extractJsonFromAiText } from "./extractJsonFromAiText";
-import { geminiReportResponseSchema } from "./reportSchema";
+import { geminiDeepReportResponseSchema, geminiReportResponseSchema, } from "./reportSchema";
 const missingApiKeyMessage = "尚未設定 GEMINI_API_KEY。請在 .env 中填入 Gemini API Key 後重新啟動開發伺服器。";
 const rateLimitedMessage = "Gemini API 目前請求過於頻繁，請稍後再試。";
 const temporaryErrorMessage = "Gemini 暫時無法回應，請稍後再試。";
@@ -20,6 +22,16 @@ export const geminiProvider = {
     name: "gemini",
     async generateReport(input, env) {
         const result = await generateGeminiPocReport(input, {
+            apiKey: readRuntimeEnv("GEMINI_API_KEY", env),
+            model: readRuntimeEnv("GEMINI_MODEL", env),
+        });
+        return {
+            report: result.report,
+            warnings: result.warnings,
+        };
+    },
+    async generateDeepReport(input, env) {
+        const result = await generateGeminiDeepReport(input, {
             apiKey: readRuntimeEnv("GEMINI_API_KEY", env),
             model: readRuntimeEnv("GEMINI_MODEL", env),
         });
@@ -62,6 +74,43 @@ export async function generateGeminiPocReport(input, options) {
         rawText,
         report,
         warnings: validation.warnings,
+        provider: "gemini",
+        model,
+    };
+}
+export async function generateGeminiDeepReport(input, options) {
+    const apiKey = options.apiKey?.trim();
+    const model = options.model?.trim() || "gemini-2.5-flash";
+    if (!apiKey) {
+        throw new Error(missingApiKeyMessage);
+    }
+    const prompt = buildDeepReportPrompt(input);
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+    const requestBody = {
+        contents: [
+            {
+                role: "user",
+                parts: [{ text: prompt }],
+            },
+        ],
+        generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: geminiDeepReportResponseSchema,
+        },
+    };
+    const response = await fetchGeminiWithRetry(endpoint, requestBody);
+    const payload = await response.json();
+    const rawText = extractGeminiText(payload);
+    const parsed = extractJsonFromAiText(rawText);
+    const validation = validateDeepReport(parsed);
+    if (!validation.isValid) {
+        throw new Error(validation.errors.join("\n"));
+    }
+    const report = normalizeDeepReport(parsed);
+    return {
+        rawText,
+        report,
+        warnings: [],
         provider: "gemini",
         model,
     };

@@ -1,4 +1,5 @@
 import type { MockReport } from "../../data/mockReports";
+import type { DeepReport } from "../../data/deepReport";
 import { type EvaluationInput } from "../promptTemplate";
 import type { AiProvider } from "./types";
 type GeminiPocOptions = {
@@ -8,6 +9,13 @@ type GeminiPocOptions = {
 export type GeminiPocResult = {
     rawText: string;
     report: MockReport;
+    warnings: string[];
+    provider: "gemini";
+    model: string;
+};
+export type GeminiDeepReportResult = {
+    rawText: string;
+    report: DeepReport;
     warnings: string[];
     provider: "gemini";
     model: string;
@@ -24,4 +32,5 @@ export declare class GeminiApiError extends Error {
 }
 export declare const geminiProvider: AiProvider;
 export declare function generateGeminiPocReport(input: EvaluationInput, options: GeminiPocOptions): Promise<GeminiPocResult>;
+export declare function generateGeminiDeepReport(input: EvaluationInput, options: GeminiPocOptions): Promise<GeminiDeepReportResult>;
 export {};

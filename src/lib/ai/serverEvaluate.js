@@ -1,6 +1,7 @@
-import { evaluateWithProvider } from "./evaluateWithProvider";
+import { evaluateDeepReportWithProvider, evaluateWithProvider, } from "./evaluateWithProvider";
 export async function evaluateFromApiRequest(payload, env) {
     const input = toEvaluationInput(payload);
+    const mode = getReportMode(payload);
     if (!input) {
         return {
             status: 400,
@@ -14,7 +15,9 @@ export async function evaluateFromApiRequest(payload, env) {
         };
     }
     try {
-        const result = await evaluateWithProvider(input, env);
+        const result = mode === "deep"
+            ? await evaluateDeepReportWithProvider(input, env)
+            : await evaluateWithProvider(input, env);
         return {
             status: 200,
             body: {
@@ -37,6 +40,13 @@ export async function evaluateFromApiRequest(payload, env) {
             },
         };
     }
+}
+function getReportMode(payload) {
+    if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+        return "free";
+    }
+    const mode = payload.mode;
+    return mode === "deep" ? "deep" : "free";
 }
 export function methodNotAllowedResponse() {
     return {

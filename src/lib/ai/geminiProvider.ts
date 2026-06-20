@@ -1,8 +1,14 @@
 import type { MockReport } from "../../data/mockReports";
+import type { DeepReport } from "../../data/deepReport";
+import { buildDeepReportPrompt } from "../deepReportPrompt";
 import { buildEvaluationPrompt, type EvaluationInput } from "../promptTemplate";
+import { normalizeDeepReport, validateDeepReport } from "../validateDeepReport";
 import { normalizeReportData, validateReportData } from "../validateReport";
 import { extractJsonFromAiText } from "./extractJsonFromAiText";
-import { geminiReportResponseSchema } from "./reportSchema";
+import {
+  geminiDeepReportResponseSchema,
+  geminiReportResponseSchema,
+} from "./reportSchema";
 import type { AiProvider, AiRuntimeEnv } from "./types";
 
 const missingApiKeyMessage =
@@ -20,6 +26,14 @@ type GeminiPocOptions = {
 export type GeminiPocResult = {
   rawText: string;
   report: MockReport;
+  warnings: string[];
+  provider: "gemini";
+  model: string;
+};
+
+export type GeminiDeepReportResult = {
+  rawText: string;
+  report: DeepReport;
   warnings: string[];
   provider: "gemini";
   model: string;
@@ -46,6 +60,17 @@ export const geminiProvider: AiProvider = {
   name: "gemini",
   async generateReport(input, env) {
     const result = await generateGeminiPocReport(input, {
+      apiKey: readRuntimeEnv("GEMINI_API_KEY", env),
+      model: readRuntimeEnv("GEMINI_MODEL", env),
+    });
+
+    return {
+      report: result.report,
+      warnings: result.warnings,
+    };
+  },
+  async generateDeepReport(input, env) {
+    const result = await generateGeminiDeepReport(input, {
       apiKey: readRuntimeEnv("GEMINI_API_KEY", env),
       model: readRuntimeEnv("GEMINI_MODEL", env),
     });
@@ -103,6 +128,56 @@ export async function generateGeminiPocReport(
     rawText,
     report,
     warnings: validation.warnings,
+    provider: "gemini",
+    model,
+  };
+}
+
+export async function generateGeminiDeepReport(
+  input: EvaluationInput,
+  options: GeminiPocOptions
+): Promise<GeminiDeepReportResult> {
+  const apiKey = options.apiKey?.trim();
+  const model = options.model?.trim() || "gemini-2.5-flash";
+
+  if (!apiKey) {
+    throw new Error(missingApiKeyMessage);
+  }
+
+  const prompt = buildDeepReportPrompt(input);
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(
+    model
+  )}:generateContent?key=${encodeURIComponent(apiKey)}`;
+
+  const requestBody = {
+    contents: [
+      {
+        role: "user",
+        parts: [{ text: prompt }],
+      },
+    ],
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: geminiDeepReportResponseSchema,
+    },
+  };
+
+  const response = await fetchGeminiWithRetry(endpoint, requestBody);
+  const payload = await response.json();
+  const rawText = extractGeminiText(payload);
+  const parsed = extractJsonFromAiText(rawText);
+  const validation = validateDeepReport(parsed);
+
+  if (!validation.isValid) {
+    throw new Error(validation.errors.join("\n"));
+  }
+
+  const report = normalizeDeepReport(parsed as DeepReport);
+
+  return {
+    rawText,
+    report,
+    warnings: [],
     provider: "gemini",
     model,
   };

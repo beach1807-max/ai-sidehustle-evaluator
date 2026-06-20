@@ -1,0 +1,78 @@
+export function validateDeepReport(data) {
+    const errors = [];
+    if (!data || typeof data !== "object" || Array.isArray(data)) {
+        return { isValid: false, errors: ["Deep Report 必須是 object"] };
+    }
+    const report = data;
+    requireObject(report.feasibility, "feasibility", errors);
+    requireObject(report.mvpFeatures, "mvpFeatures", errors);
+    requireObject(report.agentMvpKit, "agentMvpKit", errors);
+    requireObject(report.landingPageCopy, "landingPageCopy", errors);
+    requireObject(report.pricing, "pricing", errors);
+    requireObject(report.acquisition, "acquisition", errors);
+    requireObject(report.mvpReduction, "mvpReduction", errors);
+    requireArray(report.sevenDayPlan, "sevenDayPlan", errors, 7);
+    return { isValid: errors.length === 0, errors };
+}
+export function normalizeDeepReport(report) {
+    return {
+        ...report,
+        feasibility: {
+            ...report.feasibility,
+            mainRisks: report.feasibility.mainRisks ?? [],
+        },
+        mvpFeatures: {
+            mustHave: report.mvpFeatures.mustHave ?? [],
+            later: report.mvpFeatures.later ?? [],
+            notRecommended: report.mvpFeatures.notRecommended ?? [],
+        },
+        sevenDayPlan: report.sevenDayPlan ?? [],
+        agentMvpKit: {
+            ...report.agentMvpKit,
+            mvpRequirements: report.agentMvpKit.mvpRequirements ?? [],
+            pageRequirements: report.agentMvpKit.pageRequirements ?? [],
+            uiRequirements: report.agentMvpKit.uiRequirements ?? [],
+            dataStructure: report.agentMvpKit.dataStructure ?? [],
+            technicalConstraints: report.agentMvpKit.technicalConstraints ?? [],
+            acceptanceCriteria: report.agentMvpKit.acceptanceCriteria ?? [],
+        },
+        landingPageCopy: {
+            ...report.landingPageCopy,
+            features: report.landingPageCopy.features ?? [],
+        },
+        acquisition: {
+            firstUsers: report.acquisition.firstUsers ?? [],
+            suitablePlatforms: report.acquisition.suitablePlatforms ?? [],
+            lowCostPromotion: report.acquisition.lowCostPromotion ?? [],
+        },
+        mvpReduction: {
+            ...report.mvpReduction,
+            remove: report.mvpReduction.remove ?? [],
+            keep: report.mvpReduction.keep ?? [],
+        },
+        agentExecutionStrategy: report.agentExecutionStrategy
+            ? {
+                recommendedTech: report.agentExecutionStrategy.recommendedTech ?? [],
+                deploymentPlatform: report.agentExecutionStrategy.deploymentPlatform ?? "",
+                buildOrder: report.agentExecutionStrategy.buildOrder ?? [],
+                estimatedPageCount: report.agentExecutionStrategy.estimatedPageCount ?? "",
+                estimatedFileCount: report.agentExecutionStrategy.estimatedFileCount ?? "",
+                mvpDoneCriteria: report.agentExecutionStrategy.mvpDoneCriteria ?? [],
+            }
+            : undefined,
+    };
+}
+function requireObject(value, path, errors) {
+    if (!value || typeof value !== "object" || Array.isArray(value)) {
+        errors.push(`${path} 必須是 object`);
+    }
+}
+function requireArray(value, path, errors, exactLength) {
+    if (!Array.isArray(value)) {
+        errors.push(`${path} 必須是 array`);
+        return;
+    }
+    if (exactLength !== undefined && value.length !== exactLength) {
+        errors.push(`${path} 必須剛好 ${exactLength} 項`);
+    }
+}

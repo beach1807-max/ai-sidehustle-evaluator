@@ -1,5 +1,7 @@
 import { mockReport } from "../../data/mockReports";
+import { sampleDeepReport } from "../../data/deepReport";
 import { buildEvaluationPrompt } from "../promptTemplate";
+import { normalizeDeepReport, validateDeepReport } from "../validateDeepReport";
 import { normalizeReportData, validateReportData } from "../validateReport";
 export const mockProvider = {
     name: "mock",
@@ -22,6 +24,26 @@ export const mockProvider = {
         return {
             report: normalizeReportData(reportCandidate),
             warnings: validation.warnings,
+        };
+    },
+    async generateDeepReport(input) {
+        const idea = input.idea.trim();
+        const reportCandidate = {
+            ...JSON.parse(JSON.stringify(sampleDeepReport)),
+            feasibility: {
+                ...sampleDeepReport.feasibility,
+                recommendation: idea
+                    ? `建議先將「${idea}」縮成 7 天可驗證 MVP，再決定是否投入更多時間。`
+                    : sampleDeepReport.feasibility.recommendation,
+            },
+        };
+        const validation = validateDeepReport(reportCandidate);
+        if (!validation.isValid) {
+            throw new Error(validation.errors.join("\n"));
+        }
+        return {
+            report: normalizeDeepReport(reportCandidate),
+            warnings: [],
         };
     },
 };

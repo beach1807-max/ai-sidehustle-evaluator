@@ -1,6 +1,9 @@
 import type { EvaluationInput } from "../promptTemplate";
-import { evaluateWithProvider } from "./evaluateWithProvider";
-import type { AiRuntimeEnv } from "./types";
+import {
+  evaluateDeepReportWithProvider,
+  evaluateWithProvider,
+} from "./evaluateWithProvider";
+import type { AiRuntimeEnv, ReportMode } from "./types";
 
 export type EvaluateApiResult =
   | {
@@ -21,6 +24,7 @@ export async function evaluateFromApiRequest(
   env?: AiRuntimeEnv
 ): Promise<{ status: number; body: EvaluateApiResult }> {
   const input = toEvaluationInput(payload);
+  const mode = getReportMode(payload);
 
   if (!input) {
     return {
@@ -36,7 +40,10 @@ export async function evaluateFromApiRequest(
   }
 
   try {
-    const result = await evaluateWithProvider(input, env);
+    const result =
+      mode === "deep"
+        ? await evaluateDeepReportWithProvider(input, env)
+        : await evaluateWithProvider(input, env);
 
     return {
       status: 200,
@@ -64,6 +71,15 @@ export async function evaluateFromApiRequest(
       },
     };
   }
+}
+
+function getReportMode(payload: unknown): ReportMode {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    return "free";
+  }
+
+  const mode = (payload as Record<string, unknown>).mode;
+  return mode === "deep" ? "deep" : "free";
 }
 
 export function methodNotAllowedResponse() {
