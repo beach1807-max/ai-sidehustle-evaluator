@@ -226,7 +226,7 @@ export function GeminiPocPage() {
   async function copyPromptForManualTest() {
     await navigator.clipboard.writeText(buildEvaluationPrompt(input));
     setPromptCopyStatus(
-      "已複製 Prompt。你可以貼到 ChatGPT / Gemini 網頁版手動測試，再把 JSON 貼回 JSON Preview。"
+      "已複製提示詞。你可以貼到 ChatGPT / Gemini 網頁版手動測試，再把 JSON 貼回 JSON Preview。"
     );
   }
 
@@ -316,7 +316,7 @@ export function GeminiPocPage() {
                   onClick={copyPromptForManualTest}
                   className="focus-ring rounded-md bg-ink px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700"
                 >
-                  複製 Prompt，改用手動測試
+                  複製提示詞，改用手動測試
                 </button>
                 <Link
                   to="/json-preview"

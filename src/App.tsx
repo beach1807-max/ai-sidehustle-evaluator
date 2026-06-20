@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { Layout } from "./components/Layout";
+import { ScrollToTop } from "./components/ScrollToTop";
 import { HomePage } from "./pages/HomePage";
 import { EvaluatePage } from "./pages/EvaluatePage";
 import { ReportPage } from "./pages/ReportPage";
@@ -16,6 +17,7 @@ import { AgentStarterKitPage } from "./pages/AgentStarterKitPage";
 export default function App() {
   return (
     <Layout>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/evaluate" element={<EvaluatePage />} />

@@ -11,7 +11,7 @@ const generatedReportStorageKey = "generatedReportPreview";
 const generatedReportSourceKey = "generatedReportPreviewSource";
 const rateLimitMessage = "AI 目前請求過於頻繁，請稍後再試。你的輸入內容已保留。";
 const temporaryErrorMessage =
-  "AI 暫時無法回應，請稍後重試。你也可以改用 Mock 報告或複製 Prompt 手動測試。";
+  "AI 暫時無法回應，請稍後重試。你也可以改用 Mock 報告或複製提示詞手動測試。";
 const genericErrorMessage = "AI 報告產生失敗，請稍後重試。你的輸入內容已保留。";
 
 type EvaluateApiResponse =
@@ -150,7 +150,7 @@ export function EvaluatePage() {
   async function copyPromptForManualTest() {
     await navigator.clipboard.writeText(buildEvaluationPrompt(getCurrentInput()));
     setFallbackStatus(
-      "已複製 Prompt。你可以貼到 ChatGPT / Gemini 網頁版手動測試，再把 JSON 貼回 JSON Preview。"
+      "已複製提示詞。你可以貼到 ChatGPT / Gemini 網頁版手動測試，再把 JSON 貼回 JSON Preview。"
     );
   }
 
@@ -243,7 +243,7 @@ export function EvaluatePage() {
                     onClick={copyPromptForManualTest}
                     className="focus-ring rounded-md border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-ink transition hover:bg-frost"
                   >
-                    複製 Prompt，改用手動測試
+                    複製提示詞，改用手動測試
                   </button>
                   <Link
                     to="/json-preview"

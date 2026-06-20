@@ -37,7 +37,7 @@ export function PromptPreviewPage() {
 
   async function copyPrompt() {
     await navigator.clipboard.writeText(prompt);
-    setCopyStatus("已複製 Prompt，可以貼到 ChatGPT 測試。");
+    setCopyStatus("已複製提示詞，可以貼到 ChatGPT 測試。");
   }
 
   return (
@@ -46,7 +46,7 @@ export function PromptPreviewPage() {
         <p className="mb-2 text-sm font-semibold text-steel">開發測試工具</p>
         <h1 className="text-3xl font-bold text-ink">Prompt Preview</h1>
         <p className="mt-3 max-w-3xl leading-8 text-slate-600">
-          這是開發測試用頁面。先輸入副業點子，產生給 AI 的完整 Prompt，再複製到 ChatGPT 測試 JSON 回傳品質。
+          這是開發測試用頁面。先輸入副業點子，產生給 AI 的完整提示詞，再複製到 ChatGPT 測試 JSON 回傳品質。
         </p>
       </div>
 
@@ -81,7 +81,7 @@ export function PromptPreviewPage() {
               onClick={copyPrompt}
               className="focus-ring rounded-md bg-ink px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700"
             >
-              複製 Prompt
+              複製提示詞
             </button>
           </div>
           {copyStatus && (
@@ -101,7 +101,7 @@ export function PromptPreviewPage() {
         <h2 className="text-lg font-bold text-ink">測試流程</h2>
         <ol className="mt-4 grid gap-2 text-sm leading-7 text-slate-700 sm:grid-cols-2">
           <li>1. 在本頁填入副業點子</li>
-          <li>2. 複製下方 Prompt</li>
+          <li>2. 複製下方提示詞</li>
           <li>3. 貼到 ChatGPT，要求它只回傳 JSON</li>
           <li>4. 複製 ChatGPT 回傳的 JSON</li>
           <li>5. 前往 JSON Preview</li>

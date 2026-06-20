@@ -84,6 +84,21 @@ export function HomePage() {
         </div>
       </Section>
 
+      <Section title="什麼是 AI Agent？">
+        <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="max-w-3xl space-y-4 leading-8 text-slate-700">
+            <p>AI Agent 可以理解成「會幫你執行任務的 AI 助手」。</p>
+            <p>一般 AI 聊天是你問一句、它回一句。</p>
+            <p>
+              AI Agent 更像是：你給它一份清楚的任務說明，它可以幫你建立檔案、修改程式、整理架構，甚至一步步做出第一版網站。
+            </p>
+            <p className="font-medium text-ink">
+              本工具會幫你把副業點子整理成 AI Agent 看得懂的開發任務，讓你不用從零開始寫需求。
+            </p>
+          </div>
+        </div>
+      </Section>
+
       <Section title="適合誰使用">
         <div className="grid gap-5 md:grid-cols-2">
           <AudienceCard title="適合" items={goodFit} tone="good" />

@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 
 const paidReportItems = [
   "7 天 MVP 行動計畫",
-  "Codex 開發提示詞",
+  "AI Agent 開工包",
+  "給 AI 的完整開發任務說明",
   "一頁式銷售頁文案",
-  "第一版收費建議",
-  "風險修正方案",
+  "第一版收費與推廣建議",
+  "風險修正與砍功能建議",
 ];
 
 type PaidReportPreviewProps = {
@@ -71,18 +72,18 @@ export function PaidReportPreview({ displayedIdea }: PaidReportPreviewProps) {
       <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
         <div>
           <span className="inline-flex rounded-full bg-frost px-3 py-1 text-sm font-semibold text-steel">
-            深度報告預覽
+            AI Agent 開工包預覽
           </span>
           <h2 className="mt-4 text-2xl font-bold text-ink">
-            想把這個點子變成可執行 MVP？
+            想讓 AI 幫你做出第一版網站？
           </h2>
           <p className="mt-3 leading-8 text-slate-600">
-            解鎖副業點子深度驗證報告，取得更具體的 7 天執行方案與 Codex 開發提示詞。
+            系統會把你的副業點子整理成一份 AI 看得懂的開發說明書，包含 MVP 功能、7 天行動計畫、AI Agent 開工包、推廣文案與收費建議。
           </p>
         </div>
 
         <div className="rounded-md border border-slate-200 bg-slate-50 p-5">
-          <p className="font-semibold text-ink">解鎖深度報告後，你會得到：</p>
+          <p className="font-semibold text-ink">產生完整開工包後，你會得到：</p>
           <ol className="mt-4 space-y-3 text-sm leading-6 text-slate-700">
             {paidReportItems.map((item, index) => (
               <li key={item} className="flex gap-3">
@@ -95,7 +96,7 @@ export function PaidReportPreview({ displayedIdea }: PaidReportPreviewProps) {
       </div>
 
       <div className="mt-6 flex flex-col gap-4 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-lg font-bold text-ink">單次深度報告：NT$49～99</p>
+        <p className="text-lg font-bold text-ink">單次完整開工包：NT$49～99</p>
         {enableDeepReport ? (
           <button
             type="button"
@@ -103,7 +104,7 @@ export function PaidReportPreview({ displayedIdea }: PaidReportPreviewProps) {
             disabled={isGenerating}
             className="focus-ring inline-flex items-center justify-center rounded-md bg-ink px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-wait disabled:bg-slate-500"
           >
-            {isGenerating ? "正在產生深度報告..." : "產生深度報告"}
+            {isGenerating ? "正在產生完整開工包..." : "產生完整開工包"}
           </button>
         ) : (
           <button
@@ -111,7 +112,7 @@ export function PaidReportPreview({ displayedIdea }: PaidReportPreviewProps) {
             onClick={() => setShowComingSoonMessage(true)}
             className="focus-ring inline-flex items-center justify-center rounded-md bg-ink px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700"
           >
-            我想要這份深度報告
+            我想要完整開工包
           </button>
         )}
       </div>

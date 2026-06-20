@@ -13,11 +13,30 @@ export function DeepReportView({ report }: DeepReportViewProps) {
         <p className="mb-2 text-sm font-semibold text-steel">Deep Report</p>
         <h1 className="text-3xl font-bold text-ink">副業點子深度驗證報告</h1>
         <p className="mt-3 max-w-3xl leading-8 text-slate-600">
-          這份報告供開發與測試使用，協助把副業點子縮成可執行 MVP。
+          這份報告會協助把副業點子縮成可執行 MVP，也就是先做出最簡單、可以測試市場反應的第一版。
         </p>
       </div>
 
       <div className="grid gap-6">
+        <DeepSection title="這份報告怎麼用？">
+          <div className="space-y-4 leading-8 text-slate-700">
+            <p>如果你是新手，不需要一次看懂所有內容。</p>
+            <p>建議照這個順序：</p>
+            <ol className="list-decimal space-y-2 pl-5">
+              <li>先看「是否值得做」，確認這個點子不要太大、太貴、太難維護。</li>
+              <li>再看「MVP 功能清單」，知道第一版只需要做哪些功能。</li>
+              <li>點擊「AI Agent 開工包」。</li>
+              <li>複製完整的開發任務說明。</li>
+              <li>貼到你使用的 AI 開發工具。</li>
+              <li>讓 AI 先做出第一版網站框架。</li>
+            </ol>
+          </div>
+        </DeepSection>
+
+        <DeepSection title="新手名詞解釋">
+          <GlossaryList />
+        </DeepSection>
+
         <DeepSection title="MVP 可行性分析">
           <div className="grid gap-4 md:grid-cols-2">
             <InfoBlock title="是否適合一人開發" value={report.feasibility.soloDeveloperFit} />
@@ -51,13 +70,13 @@ export function DeepReportView({ report }: DeepReportViewProps) {
           </div>
         </DeepSection>
 
-        <DeepSection title="AI Agent MVP 啟動包">
+        <DeepSection title="AI Agent 開工包">
           <div className="mb-5 rounded-md border border-slate-200 bg-slate-50 p-4">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h3 className="font-bold text-ink">取得可直接開工的 AI Agent Prompt</h3>
+                <h3 className="font-bold text-ink">取得可直接開工的 AI Agent 開發任務</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
-                  系統會把產品目標、功能需求、頁面、資料結構、限制與驗收條件整理成單一 Prompt。
+                  系統會把產品目標、功能需求、頁面、資料結構、限制與驗收條件整理成一份給 AI 的任務說明。
                 </p>
               </div>
               <ButtonLink to="/agent-starter-kit">AI Agent 開工包</ButtonLink>
@@ -162,12 +181,12 @@ export function DeepReportView({ report }: DeepReportViewProps) {
           </div>
         </DeepSection>
 
-        <DeepSection title="AI Agent Prompt Pack">
+        <DeepSection title="給 AI 的提示詞包">
           <div className="grid gap-5 lg:grid-cols-2">
-            <InfoBlock title="MVP 建立 Prompt" value={report.agentPromptPack.buildPrompt} />
-            <InfoBlock title="UI Prompt" value={report.agentPromptPack.uiPrompt} />
-            <InfoBlock title="資料結構 Prompt" value={report.agentPromptPack.dataPrompt} />
-            <InfoBlock title="QA 修正 Prompt" value={report.agentPromptPack.QARevisionPrompt} />
+            <InfoBlock title="建立 MVP 的提示詞" value={report.agentPromptPack.buildPrompt} />
+            <InfoBlock title="設計 UI 的提示詞" value={report.agentPromptPack.uiPrompt} />
+            <InfoBlock title="建立資料結構的提示詞" value={report.agentPromptPack.dataPrompt} />
+            <InfoBlock title="檢查與修正的提示詞" value={report.agentPromptPack.QARevisionPrompt} />
           </div>
         </DeepSection>
 
@@ -251,5 +270,41 @@ function ListBlock({ title, items }: { title: string; items: string[] }) {
         <PlainList items={items} />
       </div>
     </article>
+  );
+}
+
+function GlossaryList() {
+  const terms = [
+    {
+      term: "AI Agent",
+      description: "會幫你執行任務的 AI 工具",
+    },
+    {
+      term: "Prompt（提示詞）",
+      description: "你交給 AI 的任務說明",
+    },
+    {
+      term: "MVP（最小可行產品）",
+      description: "先做出最簡單、可以測試市場反應的第一版",
+    },
+    {
+      term: "AI Agent 開工包",
+      description: "幫 AI 準備好的施工說明書，包含功能、頁面、開發步驟與驗收條件",
+    },
+    {
+      term: "Mock（假資料 / 假流程）",
+      description: "先用假的資料或假的流程做出畫面，之後再接真的服務",
+    },
+  ];
+
+  return (
+    <dl className="grid gap-4 md:grid-cols-2">
+      {terms.map((item) => (
+        <div key={item.term} className="rounded-md border border-slate-200 bg-slate-50 p-4">
+          <dt className="font-bold text-ink">{item.term}</dt>
+          <dd className="mt-2 leading-7 text-slate-700">{item.description}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }

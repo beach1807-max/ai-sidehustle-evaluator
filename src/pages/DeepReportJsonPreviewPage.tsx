@@ -93,11 +93,11 @@ export function DeepReportJsonPreviewPage() {
         <p className="mb-2 text-sm font-semibold text-steel">開發者工具</p>
         <h1 className="text-3xl font-bold text-ink">Deep Report JSON Preview</h1>
         <p className="mt-3 max-w-3xl leading-8 text-slate-600">
-          請貼上 ChatGPT 依照 Deep Report Prompt 產出的 JSON。系統只會在瀏覽器中解析、驗證並渲染，不會呼叫 Gemini API。
+          請貼上 ChatGPT 依照 Deep Report 提示詞產出的 JSON。系統只會在瀏覽器中解析、驗證並渲染，不會呼叫 Gemini API。
         </p>
         <div className="mt-5">
           <ButtonLink to="/deep-report-prompt-preview" variant="secondary">
-            回到 Deep Prompt Preview
+            回到 Deep Report 提示詞預覽
           </ButtonLink>
         </div>
       </div>
@@ -139,7 +139,7 @@ export function DeepReportJsonPreviewPage() {
         <div className="space-y-5">
           <StatusPanel title="使用方式">
             <ol className="space-y-3 text-sm leading-7 text-slate-700">
-              <li>1. 從 Deep Prompt Preview 複製 Prompt。</li>
+              <li>1. 從 Deep Report 提示詞預覽複製提示詞。</li>
               <li>2. 貼到 ChatGPT，取得純 JSON 回覆。</li>
               <li>3. 將 JSON 貼到左側文字框。</li>
               <li>4. 點擊「驗證並渲染 Deep Report」。</li>

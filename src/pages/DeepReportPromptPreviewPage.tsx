@@ -43,13 +43,13 @@ export function DeepReportPromptPreviewPage() {
       } else {
         copyTextWithFallback(prompt);
       }
-      setCopyStatus("已複製 Deep Report Prompt，可以貼到 ChatGPT 測試。");
+      setCopyStatus("已複製 Deep Report 提示詞，可以貼到 ChatGPT 測試。");
     } catch {
       const copied = copyTextWithFallback(prompt);
       setCopyStatus(
         copied
-          ? "已複製 Deep Report Prompt，可以貼到 ChatGPT 測試。"
-          : "無法自動複製，請手動選取下方 Prompt 後複製。"
+          ? "已複製 Deep Report 提示詞，可以貼到 ChatGPT 測試。"
+          : "無法自動複製，請手動選取下方提示詞後複製。"
       );
     }
   }
@@ -60,7 +60,7 @@ export function DeepReportPromptPreviewPage() {
         <p className="mb-2 text-sm font-semibold text-steel">開發測試工具</p>
         <h1 className="text-3xl font-bold text-ink">Deep Report Prompt Preview</h1>
         <p className="mt-3 max-w-3xl leading-8 text-slate-600">
-          這是 Deep Report 開發測試用頁面。輸入副業點子後，系統會用目前的 Deep Report Prompt 邏輯產生完整提示詞，不會呼叫 Gemini API。
+          這是 Deep Report 開發測試用頁面。輸入副業點子後，系統會用目前的 Deep Report 提示詞邏輯產生完整任務說明，不會呼叫 Gemini API。
         </p>
       </div>
 
@@ -89,13 +89,13 @@ export function DeepReportPromptPreviewPage() {
 
         <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-bold text-ink">Generated Deep Report Prompt</h2>
+            <h2 className="text-lg font-bold text-ink">產生的 Deep Report 提示詞</h2>
             <button
               type="button"
               onClick={copyPrompt}
               className="focus-ring rounded-md bg-ink px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700"
             >
-              複製 Prompt
+              複製提示詞
             </button>
           </div>
           {copyStatus && (
@@ -115,7 +115,7 @@ export function DeepReportPromptPreviewPage() {
         <h2 className="text-lg font-bold text-ink">手動測試流程</h2>
         <ol className="mt-4 grid gap-2 text-sm leading-7 text-slate-700 sm:grid-cols-2">
           <li>1. 在本頁填入副業點子</li>
-          <li>2. 複製 Deep Report Prompt</li>
+          <li>2. 複製 Deep Report 提示詞</li>
           <li>3. 貼到 ChatGPT</li>
           <li>4. 複製 ChatGPT 回傳的 JSON</li>
           <li>5. 前往 Deep JSON Preview</li>
