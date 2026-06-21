@@ -1,11 +1,17 @@
 import { FormEvent, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ActionButton } from "../components/Buttons";
+import { UsageDebugPanel } from "../components/UsageDebugPanel";
 import { mockProvider } from "../lib/ai/mockProvider";
 import {
   buildEvaluationPrompt,
   type EvaluationInput,
 } from "../lib/promptTemplate";
+import {
+  canUseFreeEvaluation,
+  getFreeEvaluationLimit,
+  recordFreeEvaluationUsed,
+} from "../lib/usageLimits";
 
 const generatedReportStorageKey = "generatedReportPreview";
 const generatedReportSourceKey = "generatedReportPreviewSource";
@@ -13,6 +19,8 @@ const rateLimitMessage = "AI 目前請求過於頻繁，請稍後再試。你的
 const temporaryErrorMessage =
   "AI 暫時無法回應，請稍後重試。你也可以改用 Mock 報告或複製提示詞手動測試。";
 const genericErrorMessage = "AI 報告產生失敗，請稍後重試。你的輸入內容已保留。";
+const freeEvaluationLimitMessage =
+  "今日一般報告免費產出次數已用完。公開測試期間每日暫時開放 2 次，你仍可以查看範例報告，或明天再試。";
 
 type EvaluateApiResponse =
   | {
@@ -97,6 +105,14 @@ export function EvaluatePage() {
     };
     localStorage.setItem("coldScoreInput", JSON.stringify(savedInput));
 
+    if (!canUseFreeEvaluation()) {
+      setError(
+        freeEvaluationLimitMessage.replace("2 次", `${getFreeEvaluationLimit()} 次`)
+      );
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch("/api/evaluate", {
         method: "POST",
@@ -117,6 +133,7 @@ export function EvaluatePage() {
 
       localStorage.setItem(generatedReportStorageKey, JSON.stringify(result.report));
       localStorage.setItem(generatedReportSourceKey, "ai");
+      recordFreeEvaluationUsed();
       window.setTimeout(() => navigate("/report/generated-preview"), 300);
     } catch (providerError) {
       setError(
@@ -265,6 +282,9 @@ export function EvaluatePage() {
           </div>
         )}
       </form>
+      <div className="mt-6">
+        <UsageDebugPanel />
+      </div>
     </section>
   );
 }

@@ -127,6 +127,8 @@ export function ReportView({
 
         <PaidReportPreview
           displayedIdea={displayedIdea}
+          score={report.score}
+          decision={report.scoreLabel}
           exampleReportId={exampleReportId}
         />
       </div>

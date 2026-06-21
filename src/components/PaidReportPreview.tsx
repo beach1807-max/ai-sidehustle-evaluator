@@ -1,7 +1,20 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { exampleDeepReports } from "../data/exampleDeepReports";
+import { FeedbackUnlockForm } from "./FeedbackUnlockForm";
+import { UsageDebugPanel } from "./UsageDebugPanel";
+import {
+  canUseDeepReportFeedbackUnlock,
+  getDeepReportFeedbackUnlock,
+  markDeepReportFeedbackUnlockUsed,
+  type FeedbackSubmitResult,
+} from "../lib/feedback";
 import { normalizeDeepReport, validateDeepReport } from "../lib/validateDeepReport";
+import {
+  canUseDeepReportDailyLimit,
+  getDeepReportDailyLimit,
+  recordDeepReportUsed,
+} from "../lib/usageLimits";
 
 const paidReportItems = [
   "7 天 MVP 行動計畫",
@@ -14,6 +27,8 @@ const paidReportItems = [
 
 type PaidReportPreviewProps = {
   displayedIdea: string;
+  score?: number | string;
+  decision?: string;
   exampleReportId?: string;
 };
 
@@ -32,17 +47,27 @@ type DeepReportApiResponse =
     };
 
 const deepReportStorageKey = "deepReportPreview";
+const deepReportDailyLimitMessage =
+  "今日完整 Deep Report / AI Agent 開工包產出次數已用完。公開測試期間每日暫時開放 1 次，請明天再試。";
+const feedbackUnlockUsedMessage =
+  "這次回饋解鎖的完整開工包產出已使用完畢。公開測試期間每次回饋暫時只開放 1 次完整產出。";
 
 export function PaidReportPreview({
   displayedIdea,
+  score,
+  decision,
   exampleReportId,
 }: PaidReportPreviewProps) {
   const navigate = useNavigate();
-  const enableDeepReport = import.meta.env.VITE_ENABLE_DEEP_REPORT === "true";
   const exampleDeepReport = exampleReportId
     ? exampleDeepReports[exampleReportId]
     : undefined;
   const [showComingSoonMessage, setShowComingSoonMessage] = useState(false);
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const [canGenerateDeepReport, setCanGenerateDeepReport] = useState(
+    () => !exampleDeepReport && canUseDeepReportFeedbackUnlock()
+  );
+  const [feedbackStatus, setFeedbackStatus] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState("");
 
@@ -65,9 +90,56 @@ export function PaidReportPreview({
     navigate("/report/deep-preview");
   }
 
+  function requestDeepReportUnlock() {
+    setShowComingSoonMessage(false);
+    setError("");
+
+    const unlock = getDeepReportFeedbackUnlock();
+    if (unlock?.used) {
+      setError(feedbackUnlockUsedMessage);
+      return;
+    }
+
+    if (unlock?.unlocked) {
+      setCanGenerateDeepReport(true);
+      setFeedbackStatus("你已有一次未使用的完整開工包解鎖，可以開始產生。");
+      return;
+    }
+
+    setShowFeedbackForm(true);
+  }
+
+  function handleFeedbackUnlocked(result: FeedbackSubmitResult) {
+    setCanGenerateDeepReport(true);
+    setShowFeedbackForm(false);
+    setFeedbackStatus(result.message);
+  }
+
   async function generateDeepReport() {
     setShowComingSoonMessage(false);
     setError("");
+
+    const unlock = getDeepReportFeedbackUnlock();
+    if (unlock?.used) {
+      setCanGenerateDeepReport(false);
+      setError(feedbackUnlockUsedMessage);
+      return;
+    }
+
+    if (!canUseDeepReportFeedbackUnlock()) {
+      setCanGenerateDeepReport(false);
+      setShowFeedbackForm(true);
+      setError("請先完成回饋，才能免費解鎖一次完整 Deep Report / AI Agent 開工包。");
+      return;
+    }
+
+    if (!canUseDeepReportDailyLimit()) {
+      setError(
+        deepReportDailyLimitMessage.replace("1 次", `${getDeepReportDailyLimit()} 次`)
+      );
+      return;
+    }
+
     setIsGenerating(true);
 
     try {
@@ -87,6 +159,8 @@ export function PaidReportPreview({
       }
 
       localStorage.setItem(deepReportStorageKey, JSON.stringify(result.report));
+      markDeepReportFeedbackUnlockUsed();
+      recordDeepReportUsed();
       navigate("/report/deep-preview");
     } catch {
       setError("深度報告產生失敗，請稍後再試。");
@@ -139,22 +213,22 @@ export function PaidReportPreview({
           >
             產生完整開工包
           </button>
-        ) : enableDeepReport ? (
+        ) : canGenerateDeepReport ? (
           <button
             type="button"
             onClick={generateDeepReport}
             disabled={isGenerating}
             className="focus-ring inline-flex items-center justify-center rounded-md bg-ink px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-wait disabled:bg-slate-500"
           >
-            {isGenerating ? "正在產生完整開工包..." : "產生完整開工包"}
+            {isGenerating ? "正在產生完整開工包..." : "開始產生完整開工包"}
           </button>
         ) : (
           <button
             type="button"
-            onClick={() => setShowComingSoonMessage(true)}
+            onClick={requestDeepReportUnlock}
             className="focus-ring inline-flex items-center justify-center rounded-md bg-ink px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700"
           >
-            產生完整開工包
+            我想取得完整開工包
           </button>
         )}
       </div>
@@ -170,11 +244,28 @@ export function PaidReportPreview({
           此功能即將開放，感謝你的興趣。
         </p>
       )}
+      {feedbackStatus && (
+        <p className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm font-medium leading-6 text-emerald-700">
+          {feedbackStatus}
+        </p>
+      )}
       {error && (
         <p className="mt-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm font-medium leading-6 text-danger">
           {error}
         </p>
       )}
+      {showFeedbackForm && !exampleDeepReport && (
+        <FeedbackUnlockForm
+          idea={displayedIdea}
+          score={score}
+          decision={decision}
+          sourcePage={window.location.pathname}
+          onUnlocked={handleFeedbackUnlocked}
+        />
+      )}
+      <div className="mt-5">
+        <UsageDebugPanel />
+      </div>
     </section>
   );
 }
