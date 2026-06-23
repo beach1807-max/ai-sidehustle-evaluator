@@ -40,8 +40,18 @@ export function GeneratedReportPreviewPage() {
 
 function getGeneratedReportNotice() {
   const source = localStorage.getItem(sourceKey);
+  const saveStatus = localStorage.getItem("reportHistoryLastSaveStatus");
+  if (source === "saved-history") {
+    return "這是從本機報告紀錄載入的內容，不會重新呼叫 AI。";
+  }
+
   if (source === "mock-fallback") {
     return "這是 Mock 報告，用於展示報告格式，不代表你的點子已被 AI 實際分析。";
+  }
+
+  if (saveStatus === "saved") {
+    localStorage.removeItem("reportHistoryLastSaveStatus");
+    return "這是 AI 測試版產生的報告，內容僅供副業規劃與 MVP 驗證參考。已自動保存到報告紀錄，可稍後回來查看。";
   }
 
   return "這是 AI 測試版產生的報告，內容僅供副業規劃與 MVP 驗證參考。";

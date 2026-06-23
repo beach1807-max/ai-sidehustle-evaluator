@@ -7,6 +7,7 @@ const storageKey = "deepReportPreview";
 
 export function DeepReportPreviewPage() {
   const report = readDeepReport();
+  const saveStatus = localStorage.getItem("reportHistoryLastSaveStatus");
 
   if (!report) {
     return (
@@ -28,7 +29,22 @@ export function DeepReportPreviewPage() {
     );
   }
 
-  return <DeepReportView report={report} />;
+  if (saveStatus === "saved") {
+    localStorage.removeItem("reportHistoryLastSaveStatus");
+  }
+
+  return (
+    <>
+      {saveStatus === "saved" && (
+        <div className="mx-auto mt-8 max-w-6xl px-5">
+          <p className="rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm font-medium leading-6 text-emerald-700">
+            已自動保存到報告紀錄，可稍後回來查看。
+          </p>
+        </div>
+      )}
+      <DeepReportView report={report} />
+    </>
+  );
 }
 
 function readDeepReport(): DeepReport | null {

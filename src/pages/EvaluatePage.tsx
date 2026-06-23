@@ -7,6 +7,8 @@ import {
   buildEvaluationPrompt,
   type EvaluationInput,
 } from "../lib/promptTemplate";
+import { getEvaluateErrorMessage, postEvaluate } from "../lib/evaluateApi";
+import { saveReport } from "../lib/reportStorage";
 import {
   canUseFreeEvaluation,
   getFreeEvaluationLimit,
@@ -15,42 +17,25 @@ import {
 
 const generatedReportStorageKey = "generatedReportPreview";
 const generatedReportSourceKey = "generatedReportPreviewSource";
-const rateLimitMessage = "AI 目前請求過於頻繁，請稍後再試。你的輸入內容已保留。";
-const temporaryErrorMessage =
-  "AI 暫時無法回應，請稍後重試。你也可以改用 Mock 報告或複製提示詞手動測試。";
-const genericErrorMessage = "AI 報告產生失敗，請稍後重試。你的輸入內容已保留。";
+const genericErrorMessage = "AI 產生失敗，請稍後再試。";
 const freeEvaluationLimitMessage =
-  "今日一般報告免費產出次數已用完。公開測試期間每日暫時開放 2 次，你仍可以查看範例報告，或明天再試。";
-
-type EvaluateApiResponse =
-  | {
-      ok: true;
-      report: unknown;
-      warnings: string[];
-    }
-  | {
-      ok: false;
-      error: string;
-      code?: string;
-      retryable?: boolean;
-      details: string[];
-    };
+  "今天的一般報告免費使用次數已達上限。每日可產生 3 次，請明天再試。";
 
 const fields = [
   {
     id: "idea",
-    label: "副業點子",
-    placeholder: "例如：\nAI 寵物飼料分析推薦",
+    label: "你的點子",
+    placeholder: "例如：用 AI 幫小型餐廳自動整理 Google 評論並產生改善建議",
   },
   {
     id: "time",
     label: "可投入時間",
-    placeholder: "例如：\n下班後每天 1～2 小時",
+    placeholder: "例如：每週 5 小時，想先做一個週末 MVP",
   },
   {
     id: "avoid",
-    label: "不想做哪些事（選填）",
-    placeholder: "例如：\n不想做客服\n不想拜訪客戶\n不想長期人工維護資料\n\n可留空",
+    label: "不想做的事",
+    placeholder: "例如：不想露臉、不想做大量客服、不想碰庫存或物流",
   },
 ];
 
@@ -59,6 +44,7 @@ export function EvaluatePage() {
   const showDevTools = import.meta.env.VITE_SHOW_DEV_TOOLS === "true";
   const [isLoading, setIsLoading] = useState(false);
   const [isTakingLonger, setIsTakingLonger] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("");
   const [values, setValues] = useState<Record<string, string>>({});
   const [error, setError] = useState("");
   const [showFallback, setShowFallback] = useState(false);
@@ -67,18 +53,33 @@ export function EvaluatePage() {
   useEffect(() => {
     if (!isLoading) {
       setIsTakingLonger(false);
+      setLoadingMessage("");
       return;
     }
 
-    const timerId = window.setTimeout(() => {
+    setLoadingMessage("正在送出你的點子，請稍候...");
+    const firstTimerId = window.setTimeout(() => {
+      setLoadingMessage("AI 正在整理市場與 MVP 建議，可能還需要一點時間。");
+    }, 15000);
+    const secondTimerId = window.setTimeout(() => {
       setIsTakingLonger(true);
-    }, 20000);
+      setLoadingMessage(
+        "這次 AI 回應較慢，系統仍在等待；如果失敗，不會扣除使用次數。"
+      );
+    }, 30000);
 
-    return () => window.clearTimeout(timerId);
+    return () => {
+      window.clearTimeout(firstTimerId);
+      window.clearTimeout(secondTimerId);
+    };
   }, [isLoading]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (isLoading) {
+      return;
+    }
+
     setIsLoading(true);
     setIsTakingLonger(false);
     setError("");
@@ -107,32 +108,43 @@ export function EvaluatePage() {
 
     if (!canUseFreeEvaluation()) {
       setError(
-        freeEvaluationLimitMessage.replace("2 次", `${getFreeEvaluationLimit()} 次`)
+        freeEvaluationLimitMessage.replace(
+          "3 次",
+          `${getFreeEvaluationLimit()} 次`
+        )
       );
       setIsLoading(false);
       return;
     }
 
     try {
-      const response = await fetch("/api/evaluate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(evaluationInput),
-      });
-
-      if (!response.ok) {
-        throw new Error(genericErrorMessage);
-      }
-
-      const result = (await response.json()) as EvaluateApiResponse;
+      const result = await postEvaluate(evaluationInput);
       if (!result.ok) {
-        setError(getProviderErrorMessage(result.code));
+        setError(getEvaluateErrorMessage(result.code, result.error));
         setShowFallback(true);
         return;
       }
 
-      localStorage.setItem(generatedReportStorageKey, JSON.stringify(result.report));
+      const normalizedReport = normalizeReportForHistory(result.report);
+      localStorage.setItem(
+        generatedReportStorageKey,
+        JSON.stringify(normalizedReport)
+      );
       localStorage.setItem(generatedReportSourceKey, "ai");
+      const saved = saveReport({
+        type: "free",
+        title: normalizedReport.title || evaluationInput.idea || "未命名報告",
+        idea: evaluationInput.idea,
+        summary: normalizedReport.summary,
+        score: normalizedReport.score,
+        verdict:
+          normalizedReport.scoreLabel || normalizedReport.oneSentenceVerdict,
+        report: normalizedReport,
+        input: evaluationInput,
+      });
+      if (saved) {
+        localStorage.setItem("reportHistoryLastSaveStatus", "saved");
+      }
       recordFreeEvaluationUsed();
       window.setTimeout(() => navigate("/report/generated-preview"), 300);
     } catch (providerError) {
@@ -166,21 +178,19 @@ export function EvaluatePage() {
 
   async function copyPromptForManualTest() {
     await navigator.clipboard.writeText(buildEvaluationPrompt(getCurrentInput()));
-    setFallbackStatus(
-      "已複製提示詞。你可以貼到 ChatGPT / Gemini 網頁版手動測試，再把 JSON 貼回 JSON Preview。"
-    );
+    setFallbackStatus("已複製 prompt，可貼到 ChatGPT / Gemini 手動測試。");
   }
 
   return (
     <section className="mx-auto max-w-4xl px-5 py-12">
       <div className="mb-8">
-        <p className="mb-2 text-sm font-semibold text-steel">AI 測試版評估流程</p>
+        <p className="mb-2 text-sm font-semibold text-steel">AI 冷靜評估</p>
         <h1 className="text-3xl font-bold text-ink">輸入你的副業點子</h1>
         <p className="mt-3 max-w-3xl leading-8 text-slate-600">
-          請輸入你的副業點子、可投入時間，以及你不想做的事。AI 會用偏保守、冷靜的標準，產生一份 MVP 可行性評估報告。
+          用三個輸入快速判斷這個點子是否適合一人開工，並產生 MVP、風險與驗證方向。
         </p>
         <p className="mt-3 max-w-3xl rounded-md border border-amber-200 bg-amber-50 p-3 text-sm leading-6 text-signal">
-          這份報告是初步決策輔助，不是創業保證，也不是法律、財務或專業顧問意見。
+          AI 回覆僅供決策參考；建議先用最小成本驗證需求，再投入開發。
         </p>
       </div>
 
@@ -212,7 +222,7 @@ export function EvaluatePage() {
             {isLoading ? "分析中..." : "開始冷靜評估"}
           </ActionButton>
           <p className="text-sm text-slate-500">
-            目前為 AI 測試版，會依環境設定使用 Gemini 或 Mock provider。
+            產生成功才會扣除一般報告使用次數。
           </p>
         </div>
         {isLoading && (
@@ -221,14 +231,14 @@ export function EvaluatePage() {
               <span className="mt-1 h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-steel/30 border-t-steel" />
               <div>
                 <p className="font-semibold text-ink">
-                  正在冷靜分析你的副業點子...
+                  {loadingMessage || "正在送出你的點子，請稍候..."}
                 </p>
                 <p className="mt-1">
-                  通常需要 10～20 秒，請不要關閉頁面。
+                  請不要關閉頁面；如果 AI 請求失敗，系統不會扣除使用次數。
                 </p>
                 {isTakingLonger && (
                   <p className="mt-3 rounded-md bg-white/70 p-3 font-medium text-signal">
-                    AI 正在整理較完整的評估報告，請再稍等一下。
+                    AI 回應比平常久，系統會自動停止過久的請求，請稍後再試。
                   </p>
                 )}
               </div>
@@ -243,7 +253,7 @@ export function EvaluatePage() {
         {showFallback && (
           <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 p-4">
             <p className="text-sm leading-6 text-signal">
-              你的輸入內容已保留。你可以稍後重試，或先改用 Mock 報告預覽。
+              AI 請求沒有完成。你可以稍後重試，或先查看 Mock 報告確認流程。
             </p>
             <div className="mt-3 flex flex-wrap gap-3">
               <button
@@ -251,7 +261,7 @@ export function EvaluatePage() {
                 onClick={previewMockReport}
                 className="focus-ring rounded-md bg-ink px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700"
               >
-                改用 Mock 報告預覽
+                使用 Mock 報告預覽
               </button>
               {showDevTools && (
                 <>
@@ -260,7 +270,7 @@ export function EvaluatePage() {
                     onClick={copyPromptForManualTest}
                     className="focus-ring rounded-md border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-ink transition hover:bg-frost"
                   >
-                    複製提示詞，改用手動測試
+                    複製 prompt
                   </button>
                   <Link
                     to="/json-preview"
@@ -272,7 +282,7 @@ export function EvaluatePage() {
               )}
             </div>
             <p className="mt-3 text-sm leading-6 text-slate-600">
-              Mock 報告只用於展示報告格式，不代表你的點子已被 AI 實際分析。
+              Mock 報告不會扣除每日 AI 使用次數。
             </p>
             {fallbackStatus && (
               <p className="mt-3 rounded-md bg-emerald-50 p-3 text-sm font-medium leading-6 text-emerald-700">
@@ -289,26 +299,43 @@ export function EvaluatePage() {
   );
 }
 
-function getProviderErrorMessage(code?: string) {
-  if (code === "GEMINI_RATE_LIMITED") {
-    return rateLimitMessage;
-  }
-
-  if (code === "GEMINI_TEMPORARY_ERROR") {
-    return temporaryErrorMessage;
-  }
-
-  return genericErrorMessage;
-}
-
 function validateInput(input: EvaluationInput) {
   if (!input.idea.trim()) {
-    return "請輸入副業點子";
+    return "請先輸入你的點子。";
   }
 
   if (!input.availableTime.trim()) {
-    return "請輸入可投入時間";
+    return "請先輸入你可投入的時間。";
   }
 
   return "";
+}
+
+function normalizeReportForHistory(report: unknown) {
+  if (report && typeof report === "object" && !Array.isArray(report)) {
+    const normalizedReport = report as {
+      title?: string;
+      summary?: string;
+      score?: number | string;
+      scoreLabel?: string;
+      oneSentenceVerdict?: string;
+    };
+
+    return {
+      ...normalizedReport,
+      title: normalizedReport.title || "未命名報告",
+      summary: normalizedReport.summary || "",
+      score: normalizedReport.score,
+      scoreLabel: normalizedReport.scoreLabel || "",
+      oneSentenceVerdict: normalizedReport.oneSentenceVerdict || "",
+    };
+  }
+
+  return {
+    title: "未命名報告",
+    summary: "",
+    score: undefined,
+    scoreLabel: "",
+    oneSentenceVerdict: "",
+  };
 }

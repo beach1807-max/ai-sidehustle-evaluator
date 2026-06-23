@@ -8,6 +8,7 @@ import { ExamplesPage } from "./pages/ExamplesPage";
 import { PromptPreviewPage } from "./pages/PromptPreviewPage";
 import { JsonPreviewPage } from "./pages/JsonPreviewPage";
 import { GeneratedReportPreviewPage } from "./pages/GeneratedReportPreviewPage";
+import { ReportsPage } from "./pages/ReportsPage";
 import { GeminiPocPage } from "./pages/GeminiPocPage";
 import { DeepReportPreviewPage } from "./pages/DeepReportPreviewPage";
 import { DeepReportPromptPreviewPage } from "./pages/DeepReportPromptPreviewPage";
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="/report" element={<ReportPage />} />
         <Route path="/report/generated-preview" element={<GeneratedReportPreviewPage />} />
         <Route path="/report/deep-preview" element={<DeepReportPreviewPage />} />
+        <Route path="/reports" element={<ReportsPage />} />
         <Route path="/agent-starter-kit" element={<AgentStarterKitPage />} />
         <Route path="/report/:reportId" element={<ReportPage />} />
         <Route path="/examples" element={<ExamplesPage />} />

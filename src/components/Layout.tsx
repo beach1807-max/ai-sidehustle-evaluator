@@ -4,6 +4,7 @@ const links = [
   { href: "/", label: "首頁" },
   { href: "/evaluate", label: "輸入點子" },
   { href: "/examples", label: "範例報告" },
+  { href: "/reports", label: "報告紀錄" },
 ];
 
 const devLinks = [

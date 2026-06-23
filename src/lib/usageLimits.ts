@@ -14,11 +14,11 @@ export function getTodayDateKey() {
 }
 
 export function getFreeEvaluationLimit() {
-  return getPositiveIntegerFromEnv(import.meta.env.VITE_FREE_EVALUATION_DAILY_LIMIT, 2);
+  return getPositiveIntegerFromEnv(import.meta.env.VITE_FREE_EVALUATION_DAILY_LIMIT, 3);
 }
 
 export function getDeepReportDailyLimit() {
-  return getPositiveIntegerFromEnv(import.meta.env.VITE_DEEP_REPORT_DAILY_LIMIT, 1);
+  return getPositiveIntegerFromEnv(import.meta.env.VITE_DEEP_REPORT_DAILY_LIMIT, 3);
 }
 
 export function getFreeEvaluationUsage() {

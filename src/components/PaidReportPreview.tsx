@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import type { DeepReport } from "../data/deepReport";
 import { exampleDeepReports } from "../data/exampleDeepReports";
 import { FeedbackUnlockForm } from "./FeedbackUnlockForm";
 import { UsageDebugPanel } from "./UsageDebugPanel";
@@ -9,6 +10,8 @@ import {
   markDeepReportFeedbackUnlockUsed,
   type FeedbackSubmitResult,
 } from "../lib/feedback";
+import { getEvaluateErrorMessage, postEvaluate } from "../lib/evaluateApi";
+import { saveReport } from "../lib/reportStorage";
 import { normalizeDeepReport, validateDeepReport } from "../lib/validateDeepReport";
 import {
   canUseDeepReportDailyLimit,
@@ -17,12 +20,12 @@ import {
 } from "../lib/usageLimits";
 
 const paidReportItems = [
-  "7 天 MVP 行動計畫",
-  "AI Agent 開工包",
-  "給 AI 的完整開發任務說明",
-  "一頁式銷售頁文案",
-  "第一版收費與推廣建議",
-  "風險修正與砍功能建議",
+  "7 天 MVP 開工計畫",
+  "AI Agent 任務拆解",
+  "市場與受眾假設",
+  "風險與不要做清單",
+  "驗證腳本與第一批使用者策略",
+  "一人可執行的技術與產品範圍",
 ];
 
 type PaidReportPreviewProps = {
@@ -32,25 +35,11 @@ type PaidReportPreviewProps = {
   exampleReportId?: string;
 };
 
-type DeepReportApiResponse =
-  | {
-      ok: true;
-      report: unknown;
-      warnings: string[];
-    }
-  | {
-      ok: false;
-      error: string;
-      code?: string;
-      retryable?: boolean;
-      details: string[];
-    };
-
 const deepReportStorageKey = "deepReportPreview";
 const deepReportDailyLimitMessage =
-  "今日完整 Deep Report / AI Agent 開工包產出次數已用完。公開測試期間每日暫時開放 1 次，請明天再試。";
+  "今天的 Deep Report / AI Agent 開工包使用次數已達上限。每日可產生 3 次，請明天再試。";
 const feedbackUnlockUsedMessage =
-  "這次回饋解鎖的完整開工包產出已使用完畢。公開測試期間每次回饋暫時只開放 1 次完整產出。";
+  "這次回饋解鎖資格已使用完畢。每次回饋只能免費解鎖 1 份 Deep Report / AI Agent 開工包。";
 
 export function PaidReportPreview({
   displayedIdea,
@@ -62,23 +51,46 @@ export function PaidReportPreview({
   const exampleDeepReport = exampleReportId
     ? exampleDeepReports[exampleReportId]
     : undefined;
-  const [showComingSoonMessage, setShowComingSoonMessage] = useState(false);
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
   const [canGenerateDeepReport, setCanGenerateDeepReport] = useState(
     () => !exampleDeepReport && canUseDeepReportFeedbackUnlock()
   );
   const [feedbackStatus, setFeedbackStatus] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isTakingLonger, setIsTakingLonger] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!isGenerating) {
+      setIsTakingLonger(false);
+      setLoadingMessage("");
+      return;
+    }
+
+    setLoadingMessage("正在產生完整開工包，請稍候...");
+    const firstTimerId = window.setTimeout(() => {
+      setLoadingMessage("AI 正在整理任務、風險與 MVP 步驟，可能還需要一點時間。");
+    }, 15000);
+    const secondTimerId = window.setTimeout(() => {
+      setIsTakingLonger(true);
+      setLoadingMessage(
+        "這次 AI 回應較慢，系統仍在等待；如果失敗，不會扣除使用次數。"
+      );
+    }, 30000);
+
+    return () => {
+      window.clearTimeout(firstTimerId);
+      window.clearTimeout(secondTimerId);
+    };
+  }, [isGenerating]);
 
   function openStaticExampleStarterKit() {
     if (!exampleDeepReport) {
       return;
     }
 
-    setShowComingSoonMessage(false);
     setError("");
-
     const normalizedReport = normalizeDeepReport(exampleDeepReport);
     const validation = validateDeepReport(normalizedReport);
     if (!validation.isValid) {
@@ -91,7 +103,6 @@ export function PaidReportPreview({
   }
 
   function requestDeepReportUnlock() {
-    setShowComingSoonMessage(false);
     setError("");
 
     const unlock = getDeepReportFeedbackUnlock();
@@ -102,7 +113,7 @@ export function PaidReportPreview({
 
     if (unlock?.unlocked) {
       setCanGenerateDeepReport(true);
-      setFeedbackStatus("你已有一次未使用的完整開工包解鎖，可以開始產生。");
+      setFeedbackStatus("已取得一次 Deep Report / AI Agent 開工包解鎖資格。");
       return;
     }
 
@@ -116,7 +127,10 @@ export function PaidReportPreview({
   }
 
   async function generateDeepReport() {
-    setShowComingSoonMessage(false);
+    if (isGenerating) {
+      return;
+    }
+
     setError("");
 
     const unlock = getDeepReportFeedbackUnlock();
@@ -135,7 +149,10 @@ export function PaidReportPreview({
 
     if (!canUseDeepReportDailyLimit()) {
       setError(
-        deepReportDailyLimitMessage.replace("1 次", `${getDeepReportDailyLimit()} 次`)
+        deepReportDailyLimitMessage.replace(
+          "3 次",
+          `${getDeepReportDailyLimit()} 次`
+        )
       );
       return;
     }
@@ -143,27 +160,42 @@ export function PaidReportPreview({
     setIsGenerating(true);
 
     try {
-      const response = await fetch("/api/evaluate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...readEvaluationInput(displayedIdea),
-          mode: "deep",
-        }),
+      const input = readEvaluationInput(displayedIdea);
+      const result = await postEvaluate({
+        ...input,
+        mode: "deep",
       });
 
-      const result = (await response.json()) as DeepReportApiResponse;
-      if (!response.ok || !result.ok) {
-        setError(result.ok === false ? result.error : "深度報告產生失敗，請稍後再試。");
+      if (!result.ok) {
+        setError(getEvaluateErrorMessage(result.code, result.error));
         return;
       }
 
-      localStorage.setItem(deepReportStorageKey, JSON.stringify(result.report));
+      const validation = validateDeepReport(result.report);
+      if (!validation.isValid) {
+        setError(`Deep Report 資料格式不完整：${validation.errors.join("；")}`);
+        return;
+      }
+
+      const normalizedReport = normalizeDeepReport(result.report as DeepReport);
+      localStorage.setItem(deepReportStorageKey, JSON.stringify(normalizedReport));
+      const saved = saveReport({
+        type: "deep",
+        title: displayedIdea || "未命名報告",
+        idea: displayedIdea,
+        summary: normalizedReport.feasibility.recommendation,
+        verdict: normalizedReport.feasibility.soloDeveloperFit,
+        report: normalizedReport,
+        input,
+      });
+      if (saved) {
+        localStorage.setItem("reportHistoryLastSaveStatus", "saved");
+      }
       markDeepReportFeedbackUnlockUsed();
       recordDeepReportUsed();
       navigate("/report/deep-preview");
     } catch {
-      setError("深度報告產生失敗，請稍後再試。");
+      setError("Deep Report 產生失敗，請稍後再試。");
     } finally {
       setIsGenerating(false);
     }
@@ -177,21 +209,21 @@ export function PaidReportPreview({
             AI Agent 開工包預覽
           </span>
           <h2 className="mt-4 text-2xl font-bold text-ink">
-            想讓 AI 幫你做出第一版網站？
+            產生一份可以直接開工的完整計畫
           </h2>
           <p className="mt-3 leading-8 text-slate-600">
-            系統會把你的副業點子整理成一份 AI 看得懂的開發說明書，包含 MVP 功能、7 天行動計畫、AI Agent 開工包、推廣文案與收費建議。
+            根據你的點子與限制，整理 MVP 範圍、驗證任務、風險與 AI Agent 可執行的工作清單。
           </p>
           <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 p-4 text-sm leading-7 text-signal">
-            <p className="font-semibold text-ink">這不是單純買一份分析報告。</p>
+            <p className="font-semibold text-ink">測試版提醒</p>
             <p className="mt-2">
-              你會拿到一份可以交給 AI 開發工具的 MVP（最小可行產品 / 第一版可測試網站）開工說明書，幫你把副業點子整理成功能、頁面、開發步驟與驗收條件。
+              產生成功才會扣除 Deep Report 使用次數與回饋解鎖資格；失敗或格式錯誤不會扣除。
             </p>
           </div>
         </div>
 
         <div className="rounded-md border border-slate-200 bg-slate-50 p-5">
-          <p className="font-semibold text-ink">產生完整開工包後，你會得到：</p>
+          <p className="font-semibold text-ink">完整開工包包含</p>
           <ol className="mt-4 space-y-3 text-sm leading-6 text-slate-700">
             {paidReportItems.map((item, index) => (
               <li key={item} className="flex gap-3">
@@ -204,14 +236,14 @@ export function PaidReportPreview({
       </div>
 
       <div className="mt-6 flex flex-col gap-4 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-lg font-bold text-ink">單次完整開工包：NT$49～99</p>
+        <p className="text-lg font-bold text-ink">測試版完整開工包</p>
         {exampleDeepReport ? (
           <button
             type="button"
             onClick={openStaticExampleStarterKit}
             className="focus-ring inline-flex items-center justify-center rounded-md bg-ink px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700"
           >
-            產生完整開工包
+            查看完整開工包
           </button>
         ) : canGenerateDeepReport ? (
           <button
@@ -220,7 +252,7 @@ export function PaidReportPreview({
             disabled={isGenerating}
             className="focus-ring inline-flex items-center justify-center rounded-md bg-ink px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-wait disabled:bg-slate-500"
           >
-            {isGenerating ? "正在產生完整開工包..." : "開始產生完整開工包"}
+            {isGenerating ? "產生中..." : "產生完整開工包"}
           </button>
         ) : (
           <button
@@ -228,22 +260,38 @@ export function PaidReportPreview({
             onClick={requestDeepReportUnlock}
             className="focus-ring inline-flex items-center justify-center rounded-md bg-ink px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700"
           >
-            我想取得完整開工包
+            完成回饋解鎖
           </button>
         )}
       </div>
 
+      {isGenerating && (
+        <div className="mt-4 rounded-md border border-steel/20 bg-frost p-4 text-sm leading-6 text-steel">
+          <div className="flex items-start gap-3">
+            <span className="mt-1 h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-steel/30 border-t-steel" />
+            <div>
+              <p className="font-semibold text-ink">
+                {loadingMessage || "正在產生完整開工包，請稍候..."}
+              </p>
+              <p className="mt-1">
+                請不要重複點擊；如果 AI 請求失敗，系統不會扣除使用次數。
+              </p>
+              {isTakingLonger && (
+                <p className="mt-3 rounded-md bg-white/70 p-3 font-medium text-signal">
+                  AI 回應比平常久，系統會自動停止過久的請求，請稍後再試。
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {exampleDeepReport && (
         <p className="mt-3 text-sm leading-6 text-slate-500">
-          範例報告會直接顯示預設好的完整開工包，不會消耗 AI 產生次數。
+          這是固定範例報告，不會呼叫 AI，也不會扣除使用次數。
         </p>
       )}
 
-      {showComingSoonMessage && (
-        <p className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm font-medium leading-6 text-emerald-700">
-          此功能即將開放，感謝你的興趣。
-        </p>
-      )}
       {feedbackStatus && (
         <p className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm font-medium leading-6 text-emerald-700">
           {feedbackStatus}
@@ -277,13 +325,13 @@ function readEvaluationInput(displayedIdea: string) {
 
     return {
       idea: savedInput?.idea || displayedIdea,
-      availableTime: savedInput?.time || "未提供",
+      availableTime: savedInput?.time || "未填寫",
       avoidThings: savedInput?.avoid || "",
     };
   } catch {
     return {
       idea: displayedIdea,
-      availableTime: "未提供",
+      availableTime: "未填寫",
       avoidThings: "",
     };
   }

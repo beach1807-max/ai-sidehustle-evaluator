@@ -1,0 +1,24 @@
+
+  VITE v7.3.5  ready in 401 ms
+
+  ➜  Local:   http://127.0.0.1:5174/
+下午11:08:17 [vite] src/lib/ai/geminiProvider.ts changed, restarting server...
+下午11:08:17 [vite] server restarted.
+下午11:08:26 [vite] src/lib/ai/geminiProvider.ts changed, restarting server...
+下午11:08:26 [vite] server restarted.
+下午11:09:52 [vite] src/lib/ai/geminiProvider.ts changed, restarting server...
+下午11:09:52 [vite] server restarted.
+下午11:09:58 [vite] src/lib/ai/serverEvaluate.ts changed, restarting server...
+下午11:09:58 [vite] server restarted.
+下午11:10:37 [vite] src/lib/ai/serverEvaluate.ts changed, restarting server...
+下午11:10:37 [vite] server restarted.
+下午11:10:44 [vite] (client) hmr update /src/pages/EvaluatePage.tsx, /src/styles.css
+下午11:10:54 [vite] (client) hmr update /src/pages/EvaluatePage.tsx, /src/styles.css
+下午11:11:00 [vite] (client) hmr update /src/pages/EvaluatePage.tsx, /src/styles.css
+下午11:12:01 [vite] (client) hmr update /src/pages/EvaluatePage.tsx, /src/styles.css
+下午11:13:22 [vite] (client) hmr update /src/pages/EvaluatePage.tsx, /src/styles.css
+下午11:14:25 [vite] (client) hmr update /src/styles.css, /src/components/PaidReportPreview.tsx
+下午11:20:26 [vite] (client) hmr update /src/styles.css
+下午11:20:26 [vite] (client) hmr update /src/pages/EvaluatePage.tsx, /src/styles.css
+下午11:20:26 [vite] (client) hmr update /src/styles.css, /src/components/PaidReportPreview.tsx
+下午11:20:32 [vite] (client) hmr update /src/pages/EvaluatePage.tsx, /src/components/UsageDebugPanel.tsx, /src/components/PaidReportPreview.tsx
